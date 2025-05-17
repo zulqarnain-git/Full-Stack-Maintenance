@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Contract Data | Admin Dashboard</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (Assume same as previous examples) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li class="active"><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Upload Contract Data</h1>
+                <p class="subheader">Import contracts, clients, budgets, and parts from an Excel file.</p>
+            </header>
+
+            <div class="upload-data-layout">
+                <!-- Left Column: Upload Area & Progress -->
+                <div class="upload-main-column">
+                    <div class="card" id="uploadFormCard">
+                        <div class="card-header"><h3>Upload Excel File</h3></div>
+                        <div class="card-body">
+                            <p class="text-muted mb-4">
+                                Select or drag & drop an Excel file (.xlsx, .xls) containing your data.
+                                Refer to the instructions for the required format.
+                            </p>
+                            <div id="dropZone" class="drop-zone">
+                                <input type="file" id="fileUploadInput" class="drop-zone-input" accept=".xlsx, .xls, .csv">
+                                <div class="drop-zone-prompt">
+                                    <i class="fas fa-cloud-upload-alt drop-zone-icon"></i>
+                                    <p>Drag & drop your file here, or <strong>click to browse</strong></p>
+                                    <p class="file-name-display" id="fileNameDisplay"></p>
+                                    <small class="text-muted">Max file size: 10MB. Allowed types: .xlsx, .xls, .csv</small>
+                                </div>
+                            </div>
+                            <div class="text-right mt-4">
+                                <button class="btn btn-primary" id="uploadProcessBtn" disabled>
+                                    <i class="fas fa-cogs"></i> Upload and Process
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4" id="uploadProgressCard" style="display: none;">
+                        <div class="card-header"><h3>Upload Progress</h3></div>
+                        <div class="card-body">
+                            <ul class="progress-steps">
+                                <li class="progress-step" data-step="1">
+                                    <div class="step-icon-wrapper"><i class="fas fa-file-alt step-icon"></i></div>
+                                    <div class="step-label">File Uploaded</div>
+                                    <div class="step-status">Pending...</div>
+                                </li>
+                                <li class="progress-step" data-step="2">
+                                    <div class="step-icon-wrapper"><i class="fas fa-check-double step-icon"></i></div>
+                                    <div class="step-label">Validating Structure</div>
+                                    <div class="step-status">Pending...</div>
+                                </li>
+                                <li class="progress-step" data-step="3">
+                                    <div class="step-icon-wrapper"><i class="fas fa-microchip step-icon"></i></div>
+                                    <div class="step-label">Processing Data</div>
+                                    <div class="step-status">Pending...</div>
+                                </li>
+                                <li class="progress-step" data-step="4">
+                                    <div class="step-icon-wrapper"><i class="fas fa-database step-icon"></i></div>
+                                    <div class="step-label">Importing to Database</div>
+                                    <div class="step-status">Pending...</div>
+                                </li>
+                            </ul>
+                            <div class="overall-progress-bar mt-3" style="display: none;">
+                                <div class="progress-bar-fill" id="overallProgressBarFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4" id="uploadSummaryCard" style="display: none;">
+                        <div class="card-header"><h3>Import Summary</h3></div>
+                        <div class="card-body">
+                            <div class="upload-success-message mb-4">
+                                <i class="fas fa-check-circle"></i>
+                                <h4>Upload Successful!</h4>
+                                <p>File <strong id="summaryFileName"></strong> has been processed.</p>
+                            </div>
+                            <div class="import-summary-grid">
+                                <!-- Summary items will be populated by JS -->
+                            </div>
+                            <div class="text-right mt-4">
+                                <button class="btn btn-primary" id="uploadAnotherBtn">
+                                    <i class="fas fa-plus-circle"></i> Upload Another File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Instructions -->
+                <div class="upload-instructions-column">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-info-circle"></i> Instructions & Template</h3></div>
+                        <div class="card-body">
+                            <div class="instruction-section">
+                                <h4>File Requirements:</h4>
+                                <ul>
+                                    <li>Format: Excel (.xlsx, .xls) or CSV (.csv)</li>
+                                    <li>Max Size: 10MB</li>
+                                    <li>Encoding: UTF-8 recommended for CSV</li>
+                                </ul>
+                            </div>
+                            <div class="instruction-section">
+                                <h4>Required Sheets/Columns (Example):</h4>
+                                <p class="text-muted">Sheet names and column headers must match the template exactly.</p>
+                                <details class="mt-2">
+                                    <summary class="instruction-summary"><strong>Sheet: Contracts</strong></summary>
+                                    <ul class="instruction-details">
+                                        <li><code>ContractID</code> (Unique, Text)</li>
+                                        <li><code>ClientID</code> (Links to Clients sheet, Text)</li>
+                                        <li><code>ContractName</code> (Text)</li>
+                                        <li><code>StartDate</code> (YYYY-MM-DD)</li>
+                                        <li><code>EndDate</code> (YYYY-MM-DD)</li>
+                                        <li><code>ServiceLevel</code> (Text: Basic, Standard, Premium)</li>
+                                    </ul>
+                                </details>
+                                <details class="mt-2">
+                                    <summary class="instruction-summary"><strong>Sheet: Clients</strong></summary>
+                                     <ul class="instruction-details">
+                                        <li><code>ClientID</code> (Unique, Text)</li>
+                                        <li><code>ClientName</code> (Text)</li>
+                                        <li><code>Region</code> (Text)</li>
+                                        <li><code>ContactEmail</code> (Email)</li>
+                                    </ul>
+                                </details>
+                                <details class="mt-2">
+                                    <summary class="instruction-summary"><strong>Sheet: Budgets</strong></summary>
+                                    <ul class="instruction-details">
+                                        <li><code>ContractID</code> (Links to Contracts sheet, Text)</li>
+                                        <li><code>BudgetItem</code> (Text: e.g., Monthly Maintenance, Parts Replacement)</li>
+                                        <li><code>AllocatedAmount</code> (Number)</li>
+                                    </ul>
+                                </details>
+                                 <details class="mt-2">
+                                    <summary class="instruction-summary"><strong>Sheet: Parts</strong> (Optional)</summary>
+                                    <ul class="instruction-details">
+                                        <li><code>PartSKU</code> (Unique, Text)</li>
+                                        <li><code>PartName</code> (Text)</li>
+                                        <li><code>Category</code> (Text)</li>
+                                        <li><code>UnitPrice</code> (Number)</li>
+                                    </ul>
+                                </details>
+                            </div>
+                             <div class="instruction-section alert alert-info">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Important:</strong> Ensure all IDs are unique and correctly referenced across sheets to maintain data integrity. Data validation will be performed.
+                            </div>
+                            <a href="path/to/your/template-file.xlsx" download class="btn btn-outline btn-block mt-3">
+                                <i class="fas fa-file-excel"></i> Download Template File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="upload_data_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    const $dropZone = $('#dropZone');
+    const $fileUploadInput = $('#fileUploadInput');
+    const $fileNameDisplay = $('#fileNameDisplay');
+    const $uploadProcessBtn = $('#uploadProcessBtn');
+    
+    const $uploadFormCard = $('#uploadFormCard');
+    const $uploadProgressCard = $('#uploadProgressCard');
+    const $uploadSummaryCard = $('#uploadSummaryCard');
+    const $progressSteps = $('.progress-step');
+    const $overallProgressBarFill = $('#overallProgressBarFill');
+
+    let selectedFile = null;
+
+    // --- Drag and Drop ---
+    $dropZone.on('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('dragover');
+    });
+
+    $dropZone.on('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+    });
+
+    $dropZone.on('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    $dropZone.on('click', function() {
+        $fileUploadInput.click();
+    });
+
+    $fileUploadInput.on('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (!file) {
+            selectedFile = null;
+            $fileNameDisplay.text('');
+            $uploadProcessBtn.prop('disabled', true);
+            return;
+        }
+
+        // Basic client-side validation (type and size)
+        const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv'];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        if (!allowedTypes.includes(file.type)) {
+            showToast('Invalid file type. Please upload .xlsx, .xls, or .csv files.', 'error');
+            resetFileInput();
+            return;
+        }
+        if (file.size > maxSize) {
+            showToast('File size exceeds 10MB limit.', 'error');
+            resetFileInput();
+            return;
+        }
+
+        selectedFile = file;
+        $fileNameDisplay.text(file.name);
+        $uploadProcessBtn.prop('disabled', false);
+    }
+
+    function resetFileInput() {
+        selectedFile = null;
+        $fileNameDisplay.text('');
+        $fileUploadInput.val(''); // Clear the input
+        $uploadProcessBtn.prop('disabled', true);
+    }
+
+    // --- Upload Simulation ---
+    $uploadProcessBtn.on('click', function() {
+        if (!selectedFile) {
+            showToast('Please select a file first.', 'warning');
+            return;
+        }
+        simulateUpload();
+    });
+
+    function simulateUpload() {
+        $uploadProcessBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+        $uploadFormCard.hide();
+        $uploadProgressCard.show();
+        $uploadSummaryCard.hide();
+        resetProgressSteps();
+        $overallProgressBarFill.css('width', '0%');
+        $('.overall-progress-bar').show();
+
+
+        // Step 1: File Uploaded (simulated)
+        updateProgressStep(1, 'processing', 'Uploading file...');
+        $overallProgressBarFill.css('width', '10%');
+        setTimeout(() => {
+            updateProgressStep(1, 'completed', `File "${selectedFile.name}" uploaded.`);
+            $overallProgressBarFill.css('width', '25%');
+
+            // Step 2: Validating Structure
+            updateProgressStep(2, 'processing', 'Validating file structure and sheets...');
+            setTimeout(() => {
+                // Simulate some validation errors
+                const structureValid = Math.random() > 0.1; // 90% chance of success
+                if (structureValid) {
+                    updateProgressStep(2, 'completed', 'File structure and sheets are valid.');
+                    $overallProgressBarFill.css('width', '50%');
+
+                    // Step 3: Processing Data
+                    updateProgressStep(3, 'processing', 'Extracting and processing data from sheets...');
+                    setTimeout(() => {
+                        updateProgressStep(3, 'completed', 'Data extracted and processed.');
+                        $overallProgressBarFill.css('width', '75%');
+
+                        // Step 4: Importing to Database
+                        updateProgressStep(4, 'processing', 'Importing data into the system...');
+                        setTimeout(() => {
+                            updateProgressStep(4, 'completed', 'Data successfully imported!');
+                            $overallProgressBarFill.css('width', '100%');
+                            showUploadSummary();
+                        }, 2000); // Simulate DB import
+                    }, 2500); // Simulate data processing
+                } else {
+                    updateProgressStep(2, 'error', 'Invalid file structure. Please use the template.');
+                     $('.overall-progress-bar').hide();
+                    showToast('File validation failed. Check structure.', 'error');
+                    // Offer to go back or reset
+                     setTimeout(resetUploadFlow, 3000);
+                }
+            }, 2000); // Simulate validation
+        }, 1000); // Simulate upload
+    }
+    
+    function resetProgressSteps() {
+        $progressSteps.removeClass('completed processing error active')
+            .find('.step-status').text('Pending...');
+        $progressSteps.first().addClass('active'); // Start with first step active
+    }
+
+    function updateProgressStep(stepNumber, status, message) {
+        const $step = $(`.progress-step[data-step="${stepNumber}"]`);
+        $step.removeClass('completed processing error active'); // Clear previous states
+        $step.addClass(status).addClass('active'); // Mark current step as active
+        $step.find('.step-status').text(message);
+
+        // If current is processing or error, previous ones are completed
+        if (status === 'processing' || status === 'error') {
+            $progressSteps.each(function() {
+                if (parseInt($(this).data('step')) < stepNumber) {
+                    $(this).removeClass('processing error active').addClass('completed');
+                    // Update status message if it was pending or processing
+                    if ($(this).find('.step-status').text().endsWith('...')) {
+                         $(this).find('.step-status').text('Completed');
+                    }
+                }
+            });
+        }
+    }
+
+    // --- Upload Summary ---
+    function showUploadSummary() {
+        $uploadProgressCard.hide();
+        $uploadSummaryCard.show();
+        $('#summaryFileName').text(selectedFile ? selectedFile.name : 'your file');
+
+        // Simulated validation results
+        const results = [
+            { type: 'Contracts', valid: 150, invalid: 2, warning: 5, icon: 'fa-file-signature' },
+            { type: 'Clients', valid: 85, invalid: 0, warning: 0, icon: 'fa-users' },
+            { type: 'Budgets', valid: 148, invalid: 0, warning: 7, icon: 'fa-wallet' },
+            { type: 'Parts', valid: 420, invalid: 12, warning: 25, icon: 'fa-cogs' },
+        ];
+
+        const $summaryGrid = $('.import-summary-grid');
+        $summaryGrid.empty();
+        results.forEach(res => {
+            let statusHtml = '';
+            if (res.invalid > 0) {
+                statusHtml = `<p class="invalid"><i class="fas fa-times-circle"></i> ${res.invalid} failed</p>`;
+            } else if (res.warning > 0) {
+                 statusHtml = `<p class="warning"><i class="fas fa-exclamation-triangle"></i> ${res.warning} with warnings</p>`;
+            } else {
+                statusHtml = `<p class="valid"><i class="fas fa-check-circle"></i> All successful</p>`;
+            }
+
+            const itemHtml = `
+                <div class="summary-item">
+                    <div class="summary-item-header">
+                        <h5><i class="fas ${res.icon} mr-2 text-muted"></i>${res.type}</h5>
+                        <span class="badge badge-primary">${res.valid} Imported</span>
+                    </div>
+                    <div class="summary-item-counts">
+                        ${statusHtml}
+                    </div>
+                </div>
+            `;
+            $summaryGrid.append(itemHtml);
+        });
+    }
+
+    $('#uploadAnotherBtn').on('click', resetUploadFlow);
+
+    function resetUploadFlow() {
+        resetFileInput();
+        $uploadFormCard.show();
+        $uploadProgressCard.hide();
+        $uploadSummaryCard.hide();
+        $uploadProcessBtn.text('Upload and Process').prop('disabled', true);
+         $('.overall-progress-bar').hide();
+        resetProgressSteps();
+    }
+
+    // --- Toast Notification ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+    
+    // --- Sidebar Multi-level Menu Toggle (Example, if needed) ---
+    $('.nav-item-parent').on('click', function(e) {
+        e.preventDefault();
+        $(this).parent().toggleClass('open');
+        $(this).siblings('.sub-menu').slideToggle(200);
+    });
+    // Auto-open active parent
+    $('.nav-menu li.active-parent').addClass('open').find('.sub-menu').show();
+
+
+    // Sidebar Toggle (same as other pages)
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+    });
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992) {
+            if ($sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+            }
+        }
+    });
+
+    // Initial state
+    resetUploadFlow();
+});
+    </script>
+</body>
+</html>

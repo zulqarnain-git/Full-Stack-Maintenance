@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (Assume same as previous examples) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li class="active"><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Settings</h1>
+                <p class="subheader">Manage your account and system preferences.</p>
+            </header>
+
+            <section class="tabs-section settings-page-tabs">
+                <div class="tabs-nav">
+                    <button class="tab-link active" data-tab="profileSecurity"><i class="fas fa-user-shield"></i> Profile & Security</button>
+                    <button class="tab-link" data-tab="generalSystem"><i class="fas fa-sliders-h"></i> General System</button>
+                    <button class="tab-link" data-tab="notifications"><i class="fas fa-bell"></i> Notifications</button>
+                    <button class="tab-link" data-tab="integrations"><i class="fas fa-plug"></i> Integrations</button>
+                    <button class="tab-link" data-tab="dataBackup"><i class="fas fa-database"></i> Data & Backup</button>
+                </div>
+            </section>
+            
+            <div class="tab-content-area">
+                <!-- Profile & Security Tab -->
+                <div id="profileSecurity" class="tab-pane active">
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-header"><h3>Your Profile</h3></div>
+                            <div class="card-body">
+                                <form id="profileForm" class="settings-form">
+                                    <div class="profile-avatar-section">
+                                        <img src="https://via.placeholder.com/100" alt="User Avatar" id="profileAvatarPreview" class="profile-avatar-img">
+                                        <input type="file" id="profileAvatarInput" accept="image/*" style="display:none;">
+                                        <button type="button" class="btn btn-sm btn-outline" id="changeAvatarBtn"><i class="fas fa-camera"></i> Change</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profileName">Full Name</label>
+                                        <input type="text" id="profileName" class="form-control" value="Admin User">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="profileEmail">Email Address</label>
+                                        <input type="email" id="profileEmail" class="form-control" value="admin@maintsys.com">
+                                    </div>
+                                     <div class="form-group">
+                                        <label for="profilePhone">Phone Number</label>
+                                        <input type="tel" id="profilePhone" class="form-control" value="+15551234567">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><h3>Change Password</h3></div>
+                            <div class="card-body">
+                                <form id="passwordForm" class="settings-form">
+                                    <div class="form-group">
+                                        <label for="currentPassword">Current Password</label>
+                                        <input type="password" id="currentPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newPassword">New Password</label>
+                                        <input type="password" id="newPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmPassword">Confirm New Password</label>
+                                        <input type="password" id="confirmPassword" class="form-control" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card full-width-card">
+                             <div class="card-header"><h3>Security Settings</h3></div>
+                             <div class="card-body">
+                                <div class="settings-form">
+                                    <div class="setting-item">
+                                        <div>
+                                            <h4>Two-Factor Authentication (2FA)</h4>
+                                            <p class="text-muted">Enable 2FA for an extra layer of security.</p>
+                                        </div>
+                                        <label class="switch"><input type="checkbox" id="enable2FA"><span class="slider round"></span></label>
+                                    </div>
+                                    <hr class="my-4">
+                                    <h4>Password Policy</h4>
+                                     <div class="form-group">
+                                        <label for="minPasswordLength">Minimum Password Length</label>
+                                        <input type="number" id="minPasswordLength" class="form-control" value="8" min="6" max="32">
+                                    </div>
+                                     <div class="setting-item">
+                                        <p class="text-muted">Require uppercase & lowercase letters</p>
+                                        <label class="switch"><input type="checkbox" id="requireMixedCase" checked><span class="slider round"></span></label>
+                                    </div>
+                                     <div class="setting-item">
+                                        <p class="text-muted">Require numbers</p>
+                                        <label class="switch"><input type="checkbox" id="requireNumbers" checked><span class="slider round"></span></label>
+                                    </div>
+                                     <div class="form-group mt-3">
+                                        <label for="passwordExpiryDays">Password Expiry (days, 0 for never)</label>
+                                        <input type="number" id="passwordExpiryDays" class="form-control" value="90" min="0">
+                                    </div>
+                                    <button type="button" id="saveSecurityPolicyBtn" class="btn btn-primary mt-4">Save Security Policy</button>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General System Tab -->
+                <div id="generalSystem" class="tab-pane">
+                    <div class="card">
+                        <div class="card-header"><h3>General System Settings</h3></div>
+                        <div class="card-body">
+                            <form id="generalSettingsForm" class="settings-form">
+                                <div class="form-group">
+                                    <label for="systemName">System Name</label>
+                                    <input type="text" id="systemName" class="form-control" value="MaintSys Pro">
+                                </div>
+                                <div class="form-group">
+                                    <label for="systemLogo">System Logo</label>
+                                    <div class="logo-upload-area">
+                                        <img src="https://via.placeholder.com/150x50?text=Current+Logo" alt="System Logo" id="systemLogoPreview">
+                                        <input type="file" id="systemLogoInput" accept="image/*" style="display:none;">
+                                        <button type="button" class="btn btn-sm btn-outline" id="changeSystemLogoBtn"><i class="fas fa-upload"></i> Upload New Logo</button>
+                                    </div>
+                                    <small class="text-muted">Recommended: PNG, max 200KB, ideal ratio 3:1 (e.g., 150x50px)</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="systemTimezone">Timezone</label>
+                                    <select id="systemTimezone" class="form-control">
+                                        <option value="America/New_York">(GMT-05:00) Eastern Time</option>
+                                        <option value="Europe/London" selected>(GMT+00:00) London</option>
+                                        <option value="Asia/Tokyo">(GMT+09:00) Tokyo</option>
+                                        {/* Add more common timezones */}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="dateFormat">Date Format</label>
+                                    <select id="dateFormat" class="form-control">
+                                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                    </select>
+                                </div>
+                                 <div class="form-group">
+                                    <label for="timeFormat">Time Format</label>
+                                    <select id="timeFormat" class="form-control">
+                                        <option value="h:mm A">12-hour (e.g., 2:30 PM)</option>
+                                        <option value="HH:mm">24-hour (e.g., 14:30)</option>
+                                    </select>
+                                </div>
+                                 <div class="form-group">
+                                    <label for="defaultCurrency">Default Currency</label>
+                                    <select id="defaultCurrency" class="form-control">
+                                        <option value="USD">USD ($)</option>
+                                        <option value="EUR">EUR (€)</option>
+                                        <option value="GBP">GBP (£)</option>
+                                        <option value="JPY">JPY (¥)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save General Settings</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notifications Tab -->
+                <div id="notifications" class="tab-pane">
+                    <div class="card">
+                         <div class="card-header"><h3>Notification Preferences</h3></div>
+                         <div class="card-body">
+                            <form id="notificationSettingsForm" class="settings-form">
+                                <div class="setting-item">
+                                    <div>
+                                        <h4>Email Notifications</h4>
+                                        <p class="text-muted">Receive key updates via email.</p>
+                                    </div>
+                                    <label class="switch"><input type="checkbox" id="masterEmailNotify" checked><span class="slider round"></span></label>
+                                </div>
+                                <hr class="my-3">
+                                <div id="emailSubSettings">
+                                    <div class="setting-item"><p>New Maintenance Request</p><label class="switch"><input type="checkbox" name="emailNotifyType" value="newRequest" checked><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Request Status Update</p><label class="switch"><input type="checkbox" name="emailNotifyType" value="statusUpdate" checked><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Contract Expiry Reminder</p><label class="switch"><input type="checkbox" name="emailNotifyType" value="contractExpiry"><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Weekly Summary Report</p><label class="switch"><input type="checkbox" name="emailNotifyType" value="weeklySummary"><span class="slider round"></span></label></div>
+                                </div>
+                                <hr class="my-4">
+                                 <div class="setting-item">
+                                    <div>
+                                        <h4>System Alerts (In-App)</h4>
+                                        <p class="text-muted">Show critical system messages within the dashboard.</p>
+                                    </div>
+                                    <label class="switch"><input type="checkbox" id="inAppSystemAlerts" checked><span class="slider round"></span></label>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4">Save Notification Settings</button>
+                            </form>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Integrations Tab -->
+                <div id="integrations" class="tab-pane">
+                     <div class="card">
+                         <div class="card-header"><h3>Integrations</h3></div>
+                         <div class="card-body">
+                             <form id="integrationSettingsForm" class="settings-form">
+                                <h4><i class="fas fa-envelope-open-text"></i> Email (SMTP)</h4>
+                                <div class="form-group">
+                                    <label for="smtpHost">SMTP Host</label>
+                                    <input type="text" id="smtpHost" class="form-control" placeholder="smtp.example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="smtpPort">SMTP Port</label>
+                                    <input type="number" id="smtpPort" class="form-control" placeholder="587">
+                                </div>
+                                 <div class="form-group">
+                                    <label for="smtpUser">SMTP Username</label>
+                                    <input type="text" id="smtpUser" class="form-control" placeholder="user@example.com">
+                                </div>
+                                 <div class="form-group">
+                                    <label for="smtpPass">SMTP Password</label>
+                                    <input type="password" id="smtpPass" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="smtpEncryption">Encryption</label>
+                                    <select id="smtpEncryption" class="form-control">
+                                        <option value="tls">TLS</option>
+                                        <option value="ssl">SSL</option>
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" id="testSmtpBtn" class="btn btn-outline"><i class="fas fa-paper-plane"></i> Test SMTP</button>
+                                    <button type="submit" class="btn btn-primary">Save SMTP Settings</button>
+                                </div>
+                                <hr class="my-4">
+                                <h4><i class="fab fa-whatsapp"></i> WhatsApp (Coming Soon)</h4>
+                                <p class="text-muted">Integrate with WhatsApp Business API for notifications and client communication. This feature is under development.</p>
+                             </form>
+                         </div>
+                    </div>
+                </div>
+                
+                <!-- Data & Backup Tab -->
+                <div id="dataBackup" class="tab-pane">
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-header"><h3>System Operation</h3></div>
+                            <div class="card-body">
+                                <form id="systemOperationForm" class="settings-form">
+                                    <div class="setting-item">
+                                        <div>
+                                            <h4>Maintenance Mode</h4>
+                                            <p class="text-muted">Temporarily restrict non-admin access.</p>
+                                        </div>
+                                        <label class="switch"><input type="checkbox" id="maintenanceMode"><span class="slider round"></span></label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <div>
+                                            <h4>Debug Mode</h4>
+                                            <p class="text-muted">Enable detailed logging (for developers).</p>
+                                        </div>
+                                        <label class="switch"><input type="checkbox" id="debugMode"><span class="slider round"></span></label>
+                                    </div>
+                                     <div class="form-group mt-3">
+                                        <label for="dataRetentionDays">Data Retention (Days for old logs)</label>
+                                        <input type="number" id="dataRetentionDays" class="form-control" value="180" min="30">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Save Operation Settings</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3>Data Backup & Restore</h3></div>
+                            <div class="card-body">
+                                <form id="backupForm" class="settings-form">
+                                    <h4>Automatic Backups</h4>
+                                    <div class="setting-item">
+                                        <p class="text-muted">Enable automatic daily backups.</p>
+                                        <label class="switch"><input type="checkbox" id="autoBackupEnabled" checked><span class="slider round"></span></label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="backupTime">Backup Time (Server Time)</label>
+                                        <input type="time" id="backupTime" class="form-control" value="02:00">
+                                    </div>
+                                    <hr class="my-3">
+                                    <h4>Manual Actions</h4>
+                                    <button type="button" id="createBackupBtn" class="btn btn-primary btn-block my-2"><i class="fas fa-download"></i> Create & Download Backup Now</button>
+                                    <div class="form-group">
+                                        <label for="restoreFile">Restore from Backup File</label>
+                                        <input type="file" id="restoreFile" class="form-control" accept=".zip,.sql,.backup">
+                                    </div>
+                                    <button type="button" id="restoreBackupBtn" class="btn btn-danger btn-block" disabled><i class="fas fa-upload"></i> Restore from File</button>
+                                    <small class="text-muted d-block mt-2">Restoring will overwrite current data. Proceed with caution.</small>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="settings_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Initial State (Simulated - load from backend in real app) ---
+    let userProfile = {
+        name: "Admin User",
+        email: "admin@maintsys.com",
+        phone: "+15551234567",
+        avatarUrl: "https://via.placeholder.com/100"
+    };
+    let generalSettings = {
+        systemName: "MaintSys Pro",
+        systemLogoUrl: "https://via.placeholder.com/150x50?text=Current+Logo",
+        timezone: "Europe/London",
+        dateFormat: "MM/DD/YYYY",
+        timeFormat: "h:mm A",
+        defaultCurrency: "USD"
+    };
+    // ... add more for other settings sections
+
+    // --- Helper Functions ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+
+    function loadProfileData() {
+        $('#profileName').val(userProfile.name);
+        $('#profileEmail').val(userProfile.email);
+        $('#profilePhone').val(userProfile.phone);
+        $('#profileAvatarPreview').attr('src', userProfile.avatarUrl);
+        $('#sidebarUserAvatar').attr('src', userProfile.avatarUrl);
+        $('#sidebarUserName').text(userProfile.name);
+    }
+    loadProfileData(); // Load on page init
+
+    function loadGeneralSettings() {
+        $('#systemName').val(generalSettings.systemName);
+        $('#systemLogoPreview').attr('src', generalSettings.systemLogoUrl);
+        $('#systemTimezone').val(generalSettings.timezone);
+        $('#dateFormat').val(generalSettings.dateFormat);
+        $('#timeFormat').val(generalSettings.timeFormat);
+        $('#defaultCurrency').val(generalSettings.defaultCurrency);
+    }
+    loadGeneralSettings(); // Load on page init
+
+    // --- Tab Switching ---
+    $('.tab-link').on('click', function() {
+        const tabId = $(this).data('tab');
+        $('.tab-link').removeClass('active');
+        $(this).addClass('active');
+        $('.tab-pane').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    // --- Profile Form ---
+    $('#profileForm').on('submit', function(e) {
+        e.preventDefault();
+        userProfile.name = $('#profileName').val();
+        userProfile.email = $('#profileEmail').val();
+        userProfile.phone = $('#profilePhone').val();
+        // In a real app, send this to the backend
+        loadProfileData(); // Update UI
+        showToast('Profile updated successfully!', 'success');
+    });
+
+    $('#changeAvatarBtn').on('click', function() {
+        $('#profileAvatarInput').click();
+    });
+
+    $('#profileAvatarInput').on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                userProfile.avatarUrl = e.target.result;
+                loadProfileData(); // Update UI with new avatar
+                // Here you would typically upload the file to the server
+                showToast('Avatar preview updated. Save profile to persist.', 'info');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // --- Password Form ---
+    $('#passwordForm').on('submit', function(e) {
+        e.preventDefault();
+        const currentPass = $('#currentPassword').val();
+        const newPass = $('#newPassword').val();
+        const confirmPass = $('#confirmPassword').val();
+
+        if (newPass !== confirmPass) {
+            showToast('New passwords do not match.', 'error');
+            return;
+        }
+        if (newPass.length < (parseInt($('#minPasswordLength').val()) || 8)) { // Use policy
+             showToast(`New password must be at least ${$('#minPasswordLength').val() || 8} characters.`, 'error');
+            return;
+        }
+        // Add other policy checks here if enabled
+
+        // Simulate backend check
+        console.log("Attempting password change:", { currentPass, newPass });
+        showToast('Password updated successfully!', 'success');
+        this.reset(); // Clear form
+    });
+
+    // --- Security Policy Save ---
+    $('#saveSecurityPolicyBtn').on('click', function() {
+        const minLength = $('#minPasswordLength').val();
+        // ... get other policy values
+        console.log("Saving security policy:", { minLength /*, ... */ });
+        showToast('Security policy updated.', 'success');
+    });
+
+
+    // --- General Settings Form ---
+    $('#generalSettingsForm').on('submit', function(e) {
+        e.preventDefault();
+        generalSettings.systemName = $('#systemName').val();
+        generalSettings.timezone = $('#systemTimezone').val();
+        generalSettings.dateFormat = $('#dateFormat').val();
+        generalSettings.timeFormat = $('#timeFormat').val();
+        generalSettings.defaultCurrency = $('#defaultCurrency').val();
+        // systemLogoUrl would be updated if a new logo was uploaded and saved server-side
+        console.log("Saving general settings:", generalSettings);
+        loadGeneralSettings(); // Reflect changes
+        $('#sidebarUserName').text(generalSettings.systemName); // Update sidebar if system name affects display
+        showToast('General settings saved!', 'success');
+    });
+    
+    $('#changeSystemLogoBtn').on('click', function() {
+        $('#systemLogoInput').click();
+    });
+    $('#systemLogoInput').on('change', function(event) {
+         const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Store temporary URL for preview, actual save happens on form submit
+                generalSettings.systemLogoUrl = e.target.result; // Or store file object for upload
+                $('#systemLogoPreview').attr('src', e.target.result);
+                showToast('Logo preview updated. Save settings to apply.', 'info');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // --- Notification Settings ---
+    $('#notificationSettingsForm').on('submit', function(e) {
+        e.preventDefault();
+        const masterEmail = $('#masterEmailNotify').is(':checked');
+        let emailTypes = [];
+        if (masterEmail) {
+            $('input[name="emailNotifyType"]:checked').each(function() {
+                emailTypes.push($(this).val());
+            });
+        }
+        const inAppAlerts = $('#inAppSystemAlerts').is(':checked');
+        console.log("Saving notification settings:", { masterEmail, emailTypes, inAppAlerts });
+        showToast('Notification settings saved!', 'success');
+    });
+    
+    $('#masterEmailNotify').on('change', function() {
+        $('#emailSubSettings input[type="checkbox"]').prop('disabled', !this.checked);
+        $('#emailSubSettings').css('opacity', this.checked ? 1 : 0.5);
+    }).trigger('change'); // Trigger on load to set initial state
+
+
+    // --- Integration Settings (SMTP Example) ---
+    $('#integrationSettingsForm').on('submit', function(e) {
+        e.preventDefault();
+        const smtpSettings = {
+            host: $('#smtpHost').val(),
+            port: $('#smtpPort').val(),
+            user: $('#smtpUser').val(),
+            // pass: $('#smtpPass').val(), // Don't log passwords
+            encryption: $('#smtpEncryption').val()
+        };
+        console.log("Saving SMTP settings:", smtpSettings);
+        showToast('SMTP settings saved!', 'success');
+    });
+    $('#testSmtpBtn').on('click', function() {
+        showToast('Simulating SMTP test... Connection successful!', 'info');
+        // In real app, make an AJAX call to backend to test
+    });
+
+    // --- Data & Backup ---
+    $('#systemOperationForm').on('submit', function(e) {
+        e.preventDefault();
+        console.log("Saving system operation settings:", {
+            maintenance: $('#maintenanceMode').is(':checked'),
+            debug: $('#debugMode').is(':checked'),
+            retention: $('#dataRetentionDays').val()
+        });
+        showToast('System operation settings saved!', 'success');
+    });
+    
+    $('#createBackupBtn').on('click', function() {
+        const btn = $(this);
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating...');
+        setTimeout(() => {
+            showToast('Manual backup created successfully. Download will start.', 'success');
+            // Simulate download
+            const a = document.createElement('a');
+            a.href = "data:text/plain;charset=utf-8," + encodeURIComponent("This is a dummy backup file.");
+            a.download = `maintsys_backup_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            btn.prop('disabled', false).html('<i class="fas fa-download"></i> Create & Download Backup Now');
+        }, 2000);
+    });
+
+    $('#restoreFile').on('change', function() {
+        $('#restoreBackupBtn').prop('disabled', !$(this).val());
+    });
+
+    $('#restoreBackupBtn').on('click', function() {
+        if (!$('#restoreFile').val()) {
+            showToast('Please select a backup file to restore.', 'warning');
+            return;
+        }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Restoring from backup will overwrite current data. This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, restore it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Restoring...');
+                 $('#restoreFile').prop('disabled', true);
+                setTimeout(() => {
+                    showToast('System restored successfully from backup!', 'success');
+                    btn.prop('disabled', false).html('<i class="fas fa-upload"></i> Restore from File');
+                    $('#restoreFile').val('').prop('disabled', false); // Clear file input
+                    $('#restoreBackupBtn').prop('disabled', true); // Disable button again
+                    // Potentially reload page or redirect
+                }, 3000);
+            }
+        });
+    });
+
+    // --- Sidebar Toggle (same as other pages) ---
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+    });
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992) {
+            if ($sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+            }
+        }
+    });
+});
+    </script>
+</body>
+</html>

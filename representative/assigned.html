@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Requests | MaintSys Rep</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Representative Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request<span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Assigned Maintenance Requests</h1>
+                    <p class="subheader">Manage and update your current tasks.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- KPI Summary for Assigned Page -->
+            <section class="kpi-widgets-section">
+                <div class="kpi-card-rep">
+                    <div class="icon bg-yellow"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="text"><h4 id="kpiTotalAssigned">0</h4><p>Total Active</p></div>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-red"><i class="fas fa-star"></i></div>
+                    <div class="text"><h4 id="kpiHighPriority">0</h4><p>High Priority</p></div>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-yellow-custom"><i class="fas fa-box-open"></i></div> <!-- Custom yellow -->
+                    <div class="text"><h4 id="kpiPendingParts">0</h4><p>Pending Parts</p></div>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-orange"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="text"><h4 id="kpiDueSoon">0</h4><p>Due Soon (2 Days)</p></div>
+                </div>
+            </section>
+
+            <section class="table-section card">
+                <div class="card-header">
+                    <h3>Your Assignments</h3>
+                    <div class="table-actions-filters">
+                        <div class="search-container">
+                             <i class="fas fa-search"></i>
+                            <input type="text" id="assignedTasksSearch" placeholder="Search ID, Client, Vehicle..." class="form-control form-control-sm">
+                        </div>
+                        <select id="assignedStatusFilter" class="form-control form-control-sm">
+                            <option value="">All Active Statuses</option>
+                            <option value="approved">Approved (To Start)</option>
+                            <option value="parts-ordered">Parts Ordered</option>
+                            <option value="parts-arrived">Parts Arrived</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="installation-scheduled">Installation Scheduled</option>
+                            <option value="awaiting-docs">Awaiting Docs</option>
+                        </select>
+                        <select id="assignedPriorityFilter" class="form-control form-control-sm">
+                            <option value="">All Priorities</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="assignedRequestsTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Req. ID</th>
+                                    <th>Client</th>
+                                    <th>Vehicle (Code)</th>
+                                    <th>Location</th>
+                                    <th>Assigned</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Docs</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Modal for Viewing/Updating Assigned Request -->
+    <div id="assignedRequestModal" class="modal">
+        <div class="modal-content modal-lg"> <!-- Use modal-lg or modal-xl for more space -->
+            <div class="modal-header">
+                <h4 id="assignedModalTitle">Request Details: REQ-XXX</h4>
+                <button class="close-btn" data-target-modal="assignedRequestModal">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentTaskId">
+                <div class="tabs modal-tabs"> <!-- Using .modal-tabs for specific styling if needed -->
+                    <button class="tab-link active" data-tab-id="modalTaskDetailsContent">Details</button>
+                    <button class="tab-link" data-tab-id="modalPartsInfoContent">Parts Info</button>
+                    <button class="tab-link" data-tab-id="modalUpdatesDocsContent">Update & Docs</button>
+                </div>
+
+                <div id="modalTaskDetailsContent" class="tab-content active">
+                    <h5>Client & Vehicle Information</h5>
+                    <div class="details-grid two-col"> <!-- Helper class for grid layout -->
+                        <div class="detail-item"><span class="label">Client:</span> <span class="value" id="modalClientName"></span></div>
+                        <div class="detail-item"><span class="label">Vehicle:</span> <span class="value" id="modalVehicleInfo"></span></div>
+                        <div class="detail-item"><span class="label">Location:</span> <span class="value" id="modalLocation"></span></div>
+                        <div class="detail-item"><span class="label">Assigned:</span> <span class="value" id="modalAssignedDate"></span></div>
+                        <div class="detail-item"><span class="label">Due Date:</span> <span class="value" id="modalDueDate"></span></div>
+                        <div class="detail-item"><span class="label">Priority:</span> <span class="value" id="modalPriority"></span></div>
+                        <div class="detail-item full-span"><span class="label">Problem Description:</span> <p class="value" id="modalDescription"></p></div>
+                    </div>
+                </div>
+
+                <div id="modalPartsInfoContent" class="tab-content">
+                    <h5>Parts Required / Used</h5>
+                    <ul id="modalPartsList" class="styled-list">
+                        <!-- Parts will be populated by JS -->
+                        <li>No parts information available for this task.</li>
+                    </ul>
+                    <div class="form-group mt-3">
+                        <label for="modalLogPartUsed">Log Part Used (Optional)</label>
+                        <input type="text" id="modalLogPartUsed" class="form-control form-control-sm" placeholder="e.g., Oil Filter XZ-123, Quantity: 1">
+                    </div>
+                    <button class="btn btn-sm btn-outline mt-2" id="addLoggedPartBtn"><i class="fas fa-plus"></i> Add to Log</button>
+                </div>
+
+                <div id="modalUpdatesDocsContent" class="tab-content">
+                    <h5>Update Status & Upload Documents</h5>
+                    <form id="updateRequestStatusForm">
+                        <div class="form-group">
+                            <label for="modalRequestStatusUpdate">New Status:</label>
+                            <select id="modalRequestStatusUpdate" class="form-control">
+                                <option value="approved">Approved (To Start)</option>
+                                <option value="parts-ordered">Parts Ordered</option>
+                                <option value="parts-arrived">Parts Arrived</option>
+                                <option value="in-progress">Work In Progress</option>
+                                <option value="installation-scheduled">Installation Scheduled</option>
+                                <option value="awaiting-docs">Awaiting Documents</option>
+                                <option value="completed-pending-review">Completed (Pending Review)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalDeliveryReceipt">Delivery Receipt (e.g., Parts)</label>
+                            <div class="file-input-styled">
+                                <input type="file" id="modalDeliveryReceipt" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png">
+                                <label for="modalDeliveryReceipt" class="btn btn-sm btn-outline"><i class="fas fa-upload"></i> Choose File</label>
+                                <span class="file-name-display" id="deliveryReceiptName">No file selected</span>
+                            </div>
+                            <div id="deliveryReceiptPreview" class="doc-preview-area"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalInstallationReceipt">Installation/Service Report</label>
+                             <div class="file-input-styled">
+                                <input type="file" id="modalInstallationReceipt" class="file-input-hidden" accept=".pdf,.jpg,.jpeg,.png">
+                                <label for="modalInstallationReceipt" class="btn btn-sm btn-outline"><i class="fas fa-upload"></i> Choose File</label>
+                                <span class="file-name-display" id="installationReceiptName">No file selected</span>
+                            </div>
+                            <div id="installationReceiptPreview" class="doc-preview-area"></div>
+                        </div>
+                         <div class="form-group">
+                            <label for="modalRepNotes">Notes for Admin:</label>
+                            <textarea id="modalRepNotes" class="form-control" rows="3" placeholder="Add any relevant notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-target-modal="assignedRequestModal">Close</button>
+                 <button type="button" class="btn btn-primary" id="saveTaskUpdateBtn"><i class="fas fa-save"></i> Save Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="rep_assigned_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data ---
+    let repProfileData = { name: "John Doe", avatarUrl: "https://via.placeholder.com/40?text=JD" };
+    let assignedRequestsData = [
+        { id: 'REQ-2025-044', client: 'ABC Corporation', vehicle: 'Toyota Land Cruiser', vehicleCode: 'ABC-123', location: 'Main Office, North', assignedDate: '2024-07-25', dueDate: '2024-07-28', status: 'approved', priority: 'High', parts: ['Oil Filter', 'Spark Plugs (x4)'], description: 'Standard 50k service + check engine light.', documents: { delivery: false, installation: false } },
+        { id: 'REQ-2025-043', client: 'XYZ Industries', vehicle: 'Ford F-150', vehicleCode: 'XYZ-456', location: 'Site B, South', assignedDate: '2024-07-26', dueDate: '2024-07-29', status: 'parts-ordered', priority: 'Medium', parts: ['Brake Pads (Set)', 'Rotor (Front Left)'], description: 'Brake noise reported.', documents: { delivery: false, installation: false } },
+        { id: 'REQ-2025-042', client: 'Global Logistics', vehicle: 'Mercedes Sprinter', vehicleCode: 'GLO-789', location: 'Distribution Center', assignedDate: '2024-07-27', dueDate: '2024-07-30', status: 'in-progress', priority: 'Medium', parts: ['Alternator Belt'], description: 'Replace alternator belt.', documents: { delivery: true, installation: false } },
+        { id: 'REQ-2025-041', client: 'Tech Solutions Inc', vehicle: 'Nissan Patrol', vehicleCode: 'TEC-012', location: 'Regional HQ', assignedDate: '2024-07-20', dueDate: '2024-07-26', status: 'awaiting-docs', priority: 'High', parts: ['AC Compressor', 'Refrigerant'], description: 'AC not cooling.', documents: { delivery: true, installation: false } }, // Example for awaiting docs
+    ];
+
+    // --- Helper Functions ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        try { return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
+        catch (e) { return dateString; }
+    }
+
+    function calculateDaysRemaining(dueDateStr) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const dueDate = new Date(dueDateStr);
+        dueDate.setHours(0,0,0,0);
+        const diffTime = dueDate.getTime() - today.getTime();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    
+    function loadRepProfile() {
+        $('#repSidebarAvatar').attr('src', repProfileData.avatarUrl);
+        $('#repSidebarName').text(repProfileData.name);
+    }
+    loadRepProfile();
+
+
+    function updateKpiCards() {
+        const activeTasks = assignedRequestsData.filter(r => r.status !== 'completed-pending-review' && r.status !== 'completed' && r.status !== 'cancelled');
+        $('#kpiTotalAssigned').text(activeTasks.length);
+        $('#assignedTasksCountBadgeSide').text(activeTasks.length > 0 ? activeTasks.length : '');
+
+        $('#kpiHighPriority').text(activeTasks.filter(r => r.priority === 'High').length);
+        $('#kpiPendingParts').text(activeTasks.filter(r => r.status === 'parts-ordered' || r.status === 'parts-arrived').length);
+        $('#kpiDueSoon').text(activeTasks.filter(r => {
+            const daysLeft = calculateDaysRemaining(r.dueDate);
+            return daysLeft >= 0 && daysLeft <= 2;
+        }).length);
+        $('.notification-btn').toggleClass('has-new', activeTasks.filter(r => r.priority === 'High' || calculateDaysRemaining(r.dueDate) <= 0).length > 0);
+    }
+
+    // --- DataTable Initialization ---
+    const assignedTable = $('#assignedRequestsTable').DataTable({
+        data: assignedRequestsData,
+        columns: [
+            { data: 'id' },
+            { data: 'client' },
+            { data: 'vehicle', render: function(data, type, row) { return `${data} <small class="text-muted">(${row.vehicleCode})</small>`; } },
+            { data: 'location', render: function(data) { return `<i class="fas fa-map-marker-alt text-muted mr-1"></i> ${data}`; } },
+            { data: 'assignedDate', render: formatDate },
+            { 
+                data: 'dueDate', 
+                render: function(data, type, row) {
+                    const daysLeft = calculateDaysRemaining(data);
+                    let colorClass = 'text-muted';
+                    let text = `${daysLeft} days left`;
+                    if (daysLeft < 0) { colorClass = 'text-danger'; text = `${Math.abs(daysLeft)} days overdue`; }
+                    else if (daysLeft === 0) { colorClass = 'text-warning'; text = 'Due Today'; }
+                    else if (daysLeft <= 2) { colorClass = 'text-orange'; text = `${daysLeft} days left`; } // custom orange
+                    return `${formatDate(data)}<br><small class="${colorClass}">${text}</small>`;
+                } 
+            },
+            { 
+                data: 'status',
+                render: function(data) {
+                    let badgeClass = 'badge-info'; // default
+                    let statusText = data.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    if (data === 'approved') { badgeClass = 'badge-primary'; }
+                    else if (data === 'parts-ordered' || data === 'parts-arrived') { badgeClass = 'badge-secondary'; }
+                    else if (data === 'in-progress' || data === 'installation-scheduled') { badgeClass = 'badge-orange'; } // Custom orange
+                    else if (data === 'awaiting-docs') { badgeClass = 'badge-warning'; }
+                    else if (data === 'completed-pending-review') { badgeClass = 'badge-success'; }
+                    return `<span class="badge ${badgeClass}">${statusText}</span>`;
+                }
+            },
+            { 
+                data: 'priority',
+                render: function(data) {
+                    let badgeClass = 'badge-success'; // Low
+                    if (data === 'High') badgeClass = 'badge-danger';
+                    else if (data === 'Medium') badgeClass = 'badge-warning';
+                    return `<span class="badge ${badgeClass}">${data}</span>`;
+                }
+            },
+            {
+                data: 'documents', className: 'text-center',
+                render: function(data, type, row) {
+                    const deliveryDone = data.delivery ? 'present' : 'missing';
+                    const installDone = data.installation ? 'present' : 'missing';
+                    return `
+                        <div class="doc-indicators" title="Docs: Delivery / Installation">
+                            <span class="doc-dot ${deliveryDone}" title="Delivery Receipt ${deliveryDone}"></span>
+                            <span class="doc-dot ${installDone}" title="Installation Report ${installDone}"></span>
+                        </div>`;
+                }
+            },
+            { 
+                data: null, orderable: false, className: 'action-buttons',
+                render: function(data, type, row) {
+                    return `<button class="btn btn-primary btn-sm view-update-task" data-id="${row.id}"><i class="fas fa-edit mr-1"></i> View/Update</button>`;
+                }
+            }
+        ],
+        responsive: true,
+        order: [[5, 'asc']], // Sort by Due Date
+        language: { search: "_INPUT_", searchPlaceholder: "Filter table..." },
+        dom: 'rt<"bottom-controls"<"info-wrapper"li>p>'
+    });
+
+    // --- Filtering ---
+    $('#assignedTasksSearch').on('keyup', function() {
+        assignedTable.search($(this).val()).draw();
+    });
+    $('#assignedStatusFilter').on('change', function() {
+        const val = $(this).val();
+        assignedTable.column(6).search(val ? '^' + val + '$' : '', true, false).draw(); // Exact match for status column (index 6)
+    });
+    $('#assignedPriorityFilter').on('change', function() {
+        assignedTable.column(7).search($(this).val()).draw(); // Priority column (index 7)
+    });
+
+
+    // --- Modal Logic ---
+    const $taskModal = $('#assignedRequestModal');
+    let currentTaskForModal = null;
+
+    // Open Modal
+    $('#assignedRequestsTable tbody').on('click', '.view-update-task', function() {
+        const taskId = $(this).data('id');
+        currentTaskForModal = assignedRequestsData.find(r => r.id === taskId);
+        if (currentTaskForModal) {
+            populateTaskModal(currentTaskForModal);
+            $taskModal.addClass('show');
+            // Ensure first tab is active
+            $('.modal-tabs .tab-link').removeClass('active').first().addClass('active');
+            $('.modal-body .tab-content').removeClass('active').first().addClass('active');
+
+        }
+    });
+    
+    // Populate Modal
+    function populateTaskModal(task) {
+        $('#currentTaskId').val(task.id);
+        $('#assignedModalTitle').text(`Request Details: ${task.id}`);
+        // Details Tab
+        $('#modalClientName').text(task.client);
+        $('#modalVehicleInfo').text(`${task.vehicle} (${task.vehicleCode})`);
+        $('#modalLocation').text(task.location);
+        $('#modalAssignedDate').text(formatDate(task.assignedDate));
+        $('#modalDueDate').text(formatDate(task.dueDate));
+        $('#modalPriority').html(`<span class="badge ${task.priority === 'High' ? 'badge-danger' : task.priority === 'Medium' ? 'badge-warning' : 'badge-success'}">${task.priority}</span>`);
+        $('#modalDescription').text(task.description || 'No specific description provided.');
+
+        // Parts Tab
+        const $partsList = $('#modalPartsList');
+        $partsList.empty();
+        if (task.parts && task.parts.length > 0) {
+            task.parts.forEach(part => $partsList.append(`<li>${part}</li>`));
+        } else {
+            $partsList.append('<li>No specific parts listed for this task.</li>');
+        }
+        $('#modalLogPartUsed').val(''); // Clear previous input
+
+        // Updates & Docs Tab
+        $('#modalRequestStatusUpdate').val(task.status);
+        $('#modalRepNotes').val(task.notes || ''); // Assuming tasks can have notes by rep
+        
+        // File input display
+        $('#deliveryReceiptName').text(task.documents.delivery ? 'Delivery_Receipt.pdf (Uploaded)' : 'No file selected');
+        $('#modalDeliveryReceipt').val(''); // Clear file input
+        $('#installationReceiptName').text(task.documents.installation ? 'Installation_Report.pdf (Uploaded)' : 'No file selected');
+        $('#modalInstallationReceipt').val(''); // Clear file input
+        $('#deliveryReceiptPreview').empty();
+        $('#installationReceiptPreview').empty();
+
+    }
+
+    // Modal Tab Switching
+    $('.modal-tabs .tab-link').on('click', function() {
+        const tabId = $(this).data('tab-id');
+        $('.modal-tabs .tab-link').removeClass('active');
+        $(this).addClass('active');
+        $('.modal-body .tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    // File Input Display Name
+    $('.file-input-hidden').on('change', function() {
+        const fileName = $(this).val().split('\\').pop();
+        $(this).closest('.file-input-styled').find('.file-name-display').text(fileName || 'No file selected');
+        // Basic preview for images
+        const previewAreaId = $(this).attr('id') === 'modalDeliveryReceipt' ? 'deliveryReceiptPreview' : 'installationReceiptPreview';
+        const $previewArea = $('#' + previewAreaId);
+        $previewArea.empty();
+        if (this.files && this.files[0] && this.files[0].type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $previewArea.html(`<img src="${e.target.result}" alt="Preview">`);
+            }
+            reader.readAsDataURL(this.files[0]);
+        } else if (fileName) {
+             $previewArea.text(`File: ${fileName}`);
+        }
+    });
+
+    // Save Task Update Button in Modal
+    $('#saveTaskUpdateBtn').on('click', function() {
+        if (!currentTaskForModal) return;
+
+        const taskId = currentTaskForModal.id;
+        const newStatus = $('#modalRequestStatusUpdate').val();
+        const repNotes = $('#modalRepNotes').val();
+        
+        const deliveryFile = $('#modalDeliveryReceipt')[0].files[0];
+        const installationFile = $('#modalInstallationReceipt')[0].files[0];
+
+        // Find task and update
+        const taskIndex = assignedRequestsData.findIndex(r => r.id === taskId);
+        if (taskIndex > -1) {
+            assignedRequestsData[taskIndex].status = newStatus;
+            assignedRequestsData[taskIndex].notes = repNotes; // Save notes
+            if (deliveryFile) {
+                assignedRequestsData[taskIndex].documents.delivery = true;
+                // In real app: Upload deliveryFile
+                console.log("Uploading delivery receipt:", deliveryFile.name);
+            }
+            if (installationFile) {
+                assignedRequestsData[taskIndex].documents.installation = true;
+                // In real app: Upload installationFile
+                console.log("Uploading installation report:", installationFile.name);
+            }
+            
+            // Auto-complete logic
+            if (newStatus === 'awaiting-docs' || newStatus === 'completed-pending-review') {
+                if (assignedRequestsData[taskIndex].documents.delivery && assignedRequestsData[taskIndex].documents.installation) {
+                    assignedRequestsData[taskIndex].status = 'completed-pending-review'; // Or directly to 'completed' by admin rules
+                     showToast(`Task ${taskId} is now complete and pending review.`, 'success');
+                }
+            }
+
+
+            assignedTable.row(taskIndex).data(assignedRequestsData[taskIndex]).invalidate().draw(false);
+            updateKpiCards();
+            showToast(`Task ${taskId} updated successfully!`, 'success');
+            $taskModal.removeClass('show');
+        }
+    });
+    
+    // Add Logged Part (Simulated)
+    $('#addLoggedPartBtn').on('click', function() {
+        const partInfo = $('#modalLogPartUsed').val().trim();
+        if (partInfo && currentTaskForModal) {
+            // In a real app, you'd update the task's parts log or a separate parts log
+            if (!currentTaskForModal.loggedParts) currentTaskForModal.loggedParts = [];
+            currentTaskForModal.loggedParts.push(partInfo + " (Logged)"); // Add to a temporary array on the task for demo
+            
+            // Re-populate parts list in modal (or just append)
+            const $partsList = $('#modalPartsList');
+            $partsList.empty(); // Clear and re-render for simplicity
+            (currentTaskForModal.parts || []).forEach(part => $partsList.append(`<li>${part}</li>`));
+            (currentTaskForModal.loggedParts || []).forEach(part => $partsList.append(`<li class="text-success"><i class="fas fa-check-circle mr-1"></i>${part}</li>`));
+
+
+            $('#modalLogPartUsed').val('');
+            showToast('Part usage logged for this session.', 'info');
+        } else {
+            showToast('Please enter part information.', 'warning');
+        }
+    });
+
+
+    // Modal Close (General)
+    $('.close-btn[data-target-modal], .btn-secondary[data-target-modal]').on('click', function() {
+        const modalId = $(this).data('target-modal');
+        $('#' + modalId).removeClass('show');
+    });
+    $('.modal').on('click', function(event) {
+        if (event.target === this) { $(this).removeClass('show'); }
+    });
+
+    // --- Initial Load ---
+    updateKpiCards();
+    $('#assignedStatusFilter').trigger('change'); // Apply initial filter
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', () => $sidebar.toggleClass('open'));
+    $(document).on('click', (event) => {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+        }
+    });
+});
+    </script>
+</body>
+</html>

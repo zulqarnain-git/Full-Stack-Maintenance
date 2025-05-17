@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard | MaintSys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <!-- Client Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Client Dashboard</h1>
+                    <p>Welcome back, Client User</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- CTA Banner -->
+            <section class="cta-banner card">
+                <div class="cta-content">
+                    <h3>Need vehicle maintenance?</h3>
+                    <p>Create a new maintenance request to get your vehicles serviced.</p>
+                </div>
+                <a href="new-request.html" class="btn btn-primary btn-lg"><i class="fas fa-plus"></i> Create New Request</a>
+            </section>
+
+            <!-- KPI Cards -->
+            <section class="kpi-cards-section">
+                <div class="kpi-card">
+                    <div class="icon" style="background-color: #e6f0ff; color: #0052cc;"><i class="fas fa-tasks"></i></div>
+                    <div class="text">
+                        <h4 id="activeRequestsCount">0</h4>
+                        <p>Active Requests</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="icon" style="background-color: #e6fffb; color: #08979c;"><i class="fas fa-check-double"></i></div>
+                    <div class="text">
+                        <h4 id="completedRequestsCount">0</h4>
+                        <p>Completed This Month</p>
+                    </div>
+                     <small class="kpi-trend up" id="completedTrend"><i class="fas fa-arrow-up"></i> 0%</small>
+                </div>
+                <div class="kpi-card">
+                    <div class="icon" style="background-color: #fffbe6; color: #d48806;"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="text">
+                        <h4 id="monthlyBudgetAmount">$0.00</h4>
+                        <p>Monthly Budget</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Dashboard Grid -->
+            <section class="dashboard-main-grid">
+                <div class="main-panel card"> <!-- Recent Requests -->
+                    <div class="card-header">
+                        <h3>Recent Maintenance Requests</h3>
+                        <a href="#" class="link-primary">View All <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="recentRequestsTable" class="display compact" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Vehicle</th>
+                                        <th>Date Submitted</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="sidebar-panel"> <!-- Budget & History -->
+                    <div class="card budget-overview-card">
+                        <div class="card-header"><h3>Budget Usage</h3></div>
+                        <div class="card-body">
+                            <div class="budget-item">
+                                <span>Monthly Allocation:</span>
+                                <strong id="budgetAllocation">$0.00</strong>
+                            </div>
+                            <div class="budget-item">
+                                <span>Used This Month:</span>
+                                <strong id="budgetUsed">$0.00</strong>
+                            </div>
+                             <div class="budget-item">
+                                <span>Remaining:</span>
+                                <strong class="text-success" id="budgetRemaining">$0.00</strong>
+                            </div>
+                            <div class="progress-bar-container mt-3">
+                                <div class="progress-bar" id="budgetProgressBar" style="width: 0%;">
+                                    <span id="budgetUsagePercent">0%</span>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline btn-block mt-3">View Budget Details</a>
+                        </div>
+                    </div>
+
+                    <div class="card maintenance-history-card mt-4">
+                        <div class="card-header">
+                            <h3>Maintenance History</h3>
+                            <a href="#" class="link-primary">View Full History</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-line"></i>
+                                <p>Maintenance spend chart coming soon.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="card client-notifications-card mt-4">
+                        <div class="card-header"><h3>Notifications</h3> <a href="#" class="link-primary">See All</a></div>
+                        <div class="card-body">
+                            <ul class="notifications-list" id="notificationsList">
+                                <!-- Notifications populated by JS -->
+                                <li class="no-notifications">No new notifications.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="client_dashboard_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data (Replace with actual data fetching) ---
+    const clientData = {
+        name: "Dynamic Client Inc.",
+        avatarUrl: "https://randomuser.me/api/portraits/lego/1.jpg",
+        activeRequests: 4,
+        completedThisMonth: 15,
+        completedLastMonth: 12, // For trend calculation
+        monthlyBudget: 12500.00,
+        budgetUsed: 3875.50,
+    };
+
+    const recentRequestsData = [
+        { id: 'REQ045', vehicle: 'Toyota Hilux (ABC-1234)', date: '2024-05-06', status: 'Pending' },
+        { id: 'REQ039', vehicle: 'Ford Ranger (XYZ-5678)', date: '2024-04-28', status: 'Approved' },
+        { id: 'REQ032', vehicle: 'Nissan Navara (DEF-9012)', date: '2024-04-15', status: 'In Progress' },
+        { id: 'REQ027', vehicle: 'Toyota Land Cruiser (GHI-3456)', date: '2024-04-02', status: 'Completed' }
+    ];
+
+    const notificationsData = [
+        { message: "Your request <strong>REQ045</strong> has been received and is now <strong>Pending</strong>.", time: "2h ago", icon: "fa-file-alt", type: "info" },
+        { message: "Maintenance for <strong>Ford Ranger (XYZ-5678)</strong> is scheduled for tomorrow.", time: "1d ago", icon: "fa-calendar-check", type: "warning" },
+        { message: "Your monthly budget report for April is available.", time: "3d ago", icon: "fa-chart-pie", type: "success" }
+    ];
+
+    // --- Populate Dashboard ---
+    function populateDashboard() {
+        // Welcome & User Info
+        $('#welcomeMessage').text(`Welcome back, ${clientData.name}!`);
+        $('#clientSidebarName').text(clientData.name);
+        $('#clientSidebarAvatar').attr('src', clientData.avatarUrl);
+        $('#topbarClientName').text(clientData.name);
+        $('#topbarClientAvatar').attr('src', clientData.avatarUrl);
+
+
+        // KPI Cards
+        $('#activeRequestsCount').text(clientData.activeRequests);
+        $('#completedRequestsCount').text(clientData.completedThisMonth);
+        
+        let trendPercent = 0;
+        if (clientData.completedLastMonth > 0) {
+            trendPercent = ((clientData.completedThisMonth - clientData.completedLastMonth) / clientData.completedLastMonth) * 100;
+        } else if (clientData.completedThisMonth > 0) {
+            trendPercent = 100; // Infinite increase if last month was 0
+        }
+        const $completedTrend = $('#completedTrend');
+        $completedTrend.find('i').removeClass('fa-arrow-up fa-arrow-down');
+        if (trendPercent > 0) {
+            $completedTrend.removeClass('down').addClass('up').find('i').addClass('fa-arrow-up');
+        } else if (trendPercent < 0) {
+            $completedTrend.removeClass('up').addClass('down').find('i').addClass('fa-arrow-down');
+        }
+        $completedTrend.contents().filter(function() { return this.nodeType === 3; }).first().replaceWith(` ${Math.abs(trendPercent).toFixed(0)}%`);
+
+
+        $('#monthlyBudgetAmount').text(`$${clientData.monthlyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+
+        // Budget Overview
+        $('#budgetAllocation').text(`$${clientData.monthlyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        $('#budgetUsed').text(`$${clientData.budgetUsed.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        const budgetRemaining = clientData.monthlyBudget - clientData.budgetUsed;
+        $('#budgetRemaining').text(`$${budgetRemaining.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+        
+        const usagePercent = clientData.monthlyBudget > 0 ? (clientData.budgetUsed / clientData.monthlyBudget) * 100 : 0;
+        $('#budgetProgressBar').css('width', `${usagePercent}%`);
+        $('#budgetUsagePercent').text(`${usagePercent.toFixed(0)}%`);
+        if (usagePercent > 85) $('#budgetProgressBar').css('background-color', 'var(--danger-color)');
+        else if (usagePercent > 60) $('#budgetProgressBar').css('background-color', 'var(--warning-color)');
+        else $('#budgetProgressBar').css('background-color', 'var(--info-color)');
+
+
+        // Recent Requests Table
+        const $requestsTableBody = $('#recentRequestsTable tbody');
+        $requestsTableBody.empty();
+        if (recentRequestsData.length === 0) {
+            $requestsTableBody.append('<tr><td colspan="5" class="text-center text-muted py-4">No recent requests.</td></tr>');
+        } else {
+            recentRequestsData.forEach(req => {
+                let statusBadgeClass = '';
+                if (req.status === 'Completed') statusBadgeClass = 'badge-success';
+                else if (req.status === 'Pending') statusBadgeClass = 'badge-secondary';
+                else if (req.status === 'Approved') statusBadgeClass = 'badge-info';
+                else if (req.status === 'In Progress') statusBadgeClass = 'badge-warning';
+                
+                $requestsTableBody.append(`
+                    <tr>
+                        <td>${req.id}</td>
+                        <td>${req.vehicle}</td>
+                        <td>${new Date(req.date).toLocaleDateString()}</td>
+                        <td><span class="badge ${statusBadgeClass}">${req.status}</span></td>
+                        <td><a href="#" class="btn btn-sm btn-icon btn-view" title="View Details"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                `);
+            });
+        }
+        // Initialize DataTable if it's not already
+        if (!$.fn.DataTable.isDataTable('#recentRequestsTable')) {
+            $('#recentRequestsTable').DataTable({
+                searching: false,
+                lengthChange: false,
+                pageLength: 5, // Show few items
+                info: false,
+                pagingType: "simple",
+                language: {
+                    paginate: { previous: "<i class='fas fa-chevron-left'></i>", next: "<i class='fas fa-chevron-right'></i>" }
+                }
+            });
+        } else {
+             // If already initialized, clear and add new data (useful for dynamic updates)
+            // $('#recentRequestsTable').DataTable().clear().rows.add(recentRequestsData.map(Object.values)).draw();
+        }
+
+
+        // Notifications
+        const $notificationsList = $('#notificationsList');
+        $notificationsList.empty();
+        if (notificationsData.length > 0) {
+            $('#notificationCount').text(notificationsData.length).show();
+            notificationsData.forEach(note => {
+                $notificationsList.append(`<li><i class="fas ${note.icon} text-${note.type || 'muted'} mr-2"></i> ${note.message} <small class="d-block text-muted">${note.time}</small></li>`);
+            });
+        } else {
+            $('#notificationCount').hide();
+            $notificationsList.append('<li class="no-notifications">No new notifications.</li>');
+        }
+    }
+
+    populateDashboard();
+
+    // --- UI Interactions ---
+    // Sidebar Toggle
+    const $sidebar = $('.sidebar-client'); // Target client sidebar specifically
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        $('.dashboard-container').toggleClass('sidebar-collapsed-client'); // Special class for client
+    });
+
+    // User Menu Dropdown
+    $('.user-menu-button').on('click', function() {
+        $(this).parent().toggleClass('open');
+    });
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('.user-menu-dropdown').length) {
+            $('.user-menu-dropdown').removeClass('open');
+        }
+         // Close sidebar on outside click for mobile
+        if ($(window).width() < 992) {
+            if ($sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+                $('.dashboard-container').removeClass('sidebar-collapsed-client');
+            }
+        }
+    });
+
+    // Toast Notification (Example usage)
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+    // Example: showToast('Welcome to your dashboard!', 'success');
+});
+    </script>
+</body>
+</html>

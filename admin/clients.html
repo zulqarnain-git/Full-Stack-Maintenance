@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clients Management | Admin Dashboard</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+</head>
+<body>
+    <div class="dashboard-container">
+        <button class="hamburger-menu" id="hamburgerMenu"><i class="fas fa-bars"></i></button>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li class="active"><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <header class="content-header">
+                <h1>Clients Management</h1>
+                <div class="header-actions">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search clients..." style="max-width: 250px;">
+                    <button class="btn btn-primary" id="addClientBtn"><i class="fas fa-plus"></i> Add Client</button>
+                </div>
+            </header>
+
+            <section class="content-section">
+                <!-- Filters -->
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="regionFilter">Region:</label>
+                        <select id="regionFilter" class="form-control">
+                            <option value="">All Regions</option>
+                            <!-- Regions will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Clients Table -->
+                <div class="table-card">
+                    <table id="clientsTable" class="display compact" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Region</th>
+                                <th>Contracts</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <!-- Region Assignment Section -->
+                <div class="region-assignment-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> Region Overview</h3>
+                    <div id="regionsGrid" class="regions-grid">
+                        <!-- Region items will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="modalTitle">Add New Client</h4>
+                    <button type="button" class="modal-close-btn" data-dismiss="modal">×</button>
+                </div>
+                <form id="clientForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="clientId">
+                        <div class="form-group">
+                            <label for="clientName">Company Name *</label>
+                            <input type="text" class="form-control" id="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientContact">Contact Person *</label>
+                            <input type="text" class="form-control" id="clientContact" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientEmail">Email *</label>
+                                <input type="email" class="form-control" id="clientEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientPhone">Phone</label>
+                                <input type="tel" class="form-control" id="clientPhone">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientRegion">Region *</label>
+                                <select id="clientRegion" class="form-control" required>
+                                    <!-- Options populated by JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientStatus">Status</label>
+                                <select id="clientStatus" class="form-control">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveClientBtn">Save Client</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification Placeholder -->
+    <div id="toastNotification" class="toast-notification">
+        <span class="icon"><i class="fas fa-check-circle"></i></span>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        // Mock data
+        let clients = [
+            { id: 1, name: 'ABC Corporation', contact: 'John Smith', email: 'john@abccorp.com', phone: '+1 (555) 123-4567', region: 'North', status: 'active', contracts: 2 },
+            { id: 2, name: 'XYZ Industries', contact: 'Sarah Johnson', email: 'sarah@xyzind.com', phone: '+1 (555) 987-6543', region: 'South', status: 'active', contracts: 1 },
+            { id: 3, name: 'Global Logistics', contact: 'Michael Brown', email: 'michael@globallog.com', phone: '+1 (555) 456-7890', region: 'East', status: 'inactive', contracts: 0 },
+            { id: 4, name: 'Tech Solutions Inc', contact: 'Emily Davis', email: 'emily@techsol.com', phone: '+1 (555) 234-5678', region: 'West', status: 'active', contracts: 3 },
+            { id: 5, name: 'First National Bank', contact: 'Robert Wilson', email: 'robert@fnbank.com', phone: '+1 (555) 876-5432', region: 'Central', status: 'active', contracts: 1 },
+            { id: 6, name: 'Innovate Ltd', contact: 'Laura Chen', email: 'laura@innovate.com', phone: '+1 (555) 321-9876', region: 'North', status: 'active', contracts: 0 },
+        ];
+        const availableRegions = ['North', 'South', 'East', 'West', 'Central', 'Other']; // For form dropdown
+
+        let clientsTable;
+
+        // Utility Functions
+        function getStatusBadge(status) {
+            const statusClass = status === 'active' ? 'active' : 'inactive';
+            const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+            return `<span class="status-badge ${statusClass}">${statusText}</span>`;
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = $('#toastNotification');
+            const iconEl = toast.find('.icon i');
+            $('#toastMessage').text(message);
+            
+            toast.removeClass('success error').addClass(type);
+            iconEl.removeClass('fa-check-circle fa-exclamation-circle');
+            iconEl.addClass(type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle');
+
+            toast.addClass('show');
+            setTimeout(() => toast.removeClass('show'), 3000);
+        }
+        
+        function populateRegionFiltersAndForms() {
+            const uniqueRegionsInDb = [...new Set(clients.map(client => client.region))].sort();
+            const regionFilter = $('#regionFilter');
+            const clientRegionForm = $('#clientRegion');
+
+            regionFilter.find('option:not(:first)').remove(); // Clear existing options except "All Regions"
+            clientRegionForm.empty();
+
+            uniqueRegionsInDb.forEach(region => {
+                regionFilter.append(`<option value="${region}">${region}</option>`);
+            });
+            availableRegions.forEach(region => { // Use availableRegions for the form
+                clientRegionForm.append(`<option value="${region}">${region}</option>`);
+            });
+        }
+
+        function renderClientsTable() {
+            if ($.fn.DataTable.isDataTable('#clientsTable')) {
+                clientsTable.clear().rows.add(clients).draw();
+            } else {
+                clientsTable = $('#clientsTable').DataTable({
+                    data: clients,
+                    responsive: true,
+                    pageLength: 10,
+                    lengthMenu: [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+                    language: { search: "", searchPlaceholder: "Search within table..." },
+                    columns: [
+                        { data: 'id' },
+                        { data: 'name' },
+                        { data: 'contact' },
+                        { data: 'email' },
+                        { data: 'phone' },
+                        { data: 'region' },
+                        { data: 'contracts', render: function(data, type, row) {
+                            let indicator = data > 0 ? '<i class="fas fa-circle text-success" style="font-size: 0.5rem; margin-left: 5px; color: var(--success-color);"></i>' : '';
+                            return `${data} ${indicator}`;
+                          } 
+                        },
+                        { data: 'status', render: getStatusBadge },
+                        { 
+                            data: null,
+                            orderable: false,
+                            searchable: false,
+                            className: 'table-actions',
+                            render: function(data, type, row) {
+                                const activeIcon = row.status === 'active' ? 'fa-toggle-off' : 'fa-toggle-on';
+                                const statusTitle = row.status === 'active' ? 'Deactivate' : 'Activate';
+                                return `
+                                    <button class="btn btn-sm btn-icon btn-edit" title="Edit Client"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-icon btn-status-toggle" title="${statusTitle} Client"><i class="fas ${activeIcon}"></i></button>
+                                    <button class="btn btn-sm btn-icon btn-delete text-danger" title="Delete Client"><i class="fas fa-trash"></i></button>
+                                `;
+                            }
+                        }
+                    ],
+                    order: [[1, 'asc']] // Default sort by name
+                });
+            }
+            populateRegionFiltersAndForms();
+            updateRegionAssignmentSection();
+        }
+        
+        function updateRegionAssignmentSection() {
+            const regionsGrid = $('#regionsGrid');
+            regionsGrid.empty();
+            const uniqueRegions = [...new Set(clients.map(client => client.region))].sort();
+
+            if (uniqueRegions.length === 0) {
+                regionsGrid.html('<p class="text-muted col-12">No regions found or no clients assigned to regions.</p>');
+                return;
+            }
+
+            uniqueRegions.forEach(region => {
+                const clientsInRegion = clients.filter(c => c.region === region && c.status === 'active');
+                let clientListHtml = '';
+                if (clientsInRegion.length > 0) {
+                    clientListHtml = clientsInRegion.map(client => 
+                        `<li>
+                            <span>${client.name}</span>
+                            <span class="contracts-info">${client.contracts} contract(s)</span>
+                         </li>`
+                    ).join('');
+                } else {
+                    clientListHtml = '<li class="no-clients">No active clients in this region.</li>';
+                }
+
+                const regionItemHtml = `
+                    <div class="region-item">
+                        <div class="region-item-header">
+                            <h4><i class="fas fa-map-marker-alt"></i> ${region}</h4>
+                            <span class="client-count">${clientsInRegion.length} Active Client(s)</span>
+                        </div>
+                        <ul class="region-client-list">${clientListHtml}</ul>
+                    </div>
+                `;
+                regionsGrid.append(regionItemHtml);
+            });
+        }
+
+        // Modal Handling
+        function openModal(modalId) { $(modalId).addClass('active'); }
+        function closeModal(modalId) { $(modalId).removeClass('active'); }
+
+        $(document).ready(function() {
+            renderClientsTable();
+
+            // Hamburger Menu
+            $('#hamburgerMenu').on('click', function() {
+                $('#sidebar').toggleClass('open');
+                $('#mainContent').toggleClass('sidebar-open');
+            });
+
+            // Add Client Button
+            $('#addClientBtn').on('click', function() {
+                $('#clientForm')[0].reset();
+                $('#modalTitle').text('Add New Client');
+                $('#clientId').val(''); 
+                $('#clientStatus').val('active'); // Default status
+                if(availableRegions.length > 0) $('#clientRegion').val(availableRegions[0]); // Default region
+                openModal('#clientModal');
+            });
+
+            // Edit Client (delegated from table body)
+            $('#clientsTable tbody').on('click', '.btn-edit', function() {
+                const data = clientsTable.row($(this).parents('tr')).data();
+                if (data) {
+                    $('#modalTitle').text('Edit Client');
+                    $('#clientId').val(data.id);
+                    $('#clientName').val(data.name);
+                    $('#clientContact').val(data.contact);
+                    $('#clientEmail').val(data.email);
+                    $('#clientPhone').val(data.phone);
+                    $('#clientRegion').val(data.region);
+                    $('#clientStatus').val(data.status);
+                    openModal('#clientModal');
+                }
+            });
+
+            // Save Client (Add/Edit)
+            $('#clientForm').on('submit', function(e) {
+                e.preventDefault();
+                const id = parseInt($('#clientId').val());
+                const clientData = {
+                    name: $('#clientName').val(),
+                    contact: $('#clientContact').val(),
+                    email: $('#clientEmail').val(),
+                    phone: $('#clientPhone').val(),
+                    region: $('#clientRegion').val(),
+                    status: $('#clientStatus').val(),
+                    contracts: id ? clients.find(c => c.id === id).contracts : 0 // Keep contracts on edit
+                };
+
+                if (id) { // Editing
+                    const index = clients.findIndex(c => c.id === id);
+                    clients[index] = { ...clients[index], ...clientData };
+                    showToast('Client updated successfully!');
+                } else { // Adding
+                    clientData.id = clients.length > 0 ? Math.max(...clients.map(c => c.id)) + 1 : 1;
+                    clients.push(clientData);
+                    showToast('Client added successfully!');
+                }
+                renderClientsTable();
+                closeModal('#clientModal');
+            });
+
+            // Toggle Client Status
+            $('#clientsTable tbody').on('click', '.btn-status-toggle', function() {
+                const data = clientsTable.row($(this).parents('tr')).data();
+                if (data) {
+                    const newStatus = data.status === 'active' ? 'inactive' : 'active';
+                    const index = clients.findIndex(c => c.id === data.id);
+                    clients[index].status = newStatus;
+                    renderClientsTable();
+                    showToast(`${data.name}'s status updated to ${newStatus}.`);
+                }
+            });
+
+            // Delete Client
+            $('#clientsTable tbody').on('click', '.btn-delete', function() {
+                const data = clientsTable.row($(this).parents('tr')).data();
+                if (data && confirm(`Are you sure you want to delete ${data.name}?`)) {
+                    clients = clients.filter(c => c.id !== data.id);
+                    renderClientsTable();
+                    showToast(`${data.name} deleted successfully.`, 'success');
+                }
+            });
+            
+            // Modal Close Buttons & ESC
+            $('[data-dismiss="modal"]').on('click', function() {
+                closeModal($(this).closest('.modal').attr('id'));
+            });
+            $(document).on('keydown', function(event) {
+                if (event.key === "Escape") {
+                    $('.modal.active').each(function() { closeModal('#' + $(this).attr('id')); });
+                }
+            });
+
+            // Filters
+            $('#globalSearch').on('keyup', function () {
+                clientsTable.search(this.value).draw();
+            });
+            $('#statusFilter').on('change', function() {
+                clientsTable.column(7).search(this.value ? `^${this.value}$` : '', true, false).draw();
+            });
+            $('#regionFilter').on('change', function() {
+                clientsTable.column(5).search(this.value).draw();
+            });
+        });
+    </script>
+</body>
+</html>

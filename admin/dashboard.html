@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Maintenance System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Admin Dashboard</h1>
+                    <p>Welcome back, Admin User!</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Stats Cards -->
+            <section class="stats-cards-grid">
+                <!-- Cards will be injected by JavaScript -->
+            </section>
+
+            <!-- Main Dashboard Content Grid -->
+            <section class="dashboard-main-grid">
+                <div class="main-column">
+                    <div class="card recent-requests-card">
+                        <div class="card-header">
+                            <h3>Recent Maintenance Requests</h3>
+                            <a href="#" class="view-all-link">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <table class="recent-requests-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Client</th>
+                                        <th>Vehicle</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentRequestsTableBody">
+                                    <!-- Rows will be injected by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-column">
+                    <div class="card status-overview-card">
+                        <div class="card-header">
+                            <h3>Maintenance Requests Status</h3>
+                        </div>
+                        <div class="card-content" id="statusOverviewContent">
+                            <!-- Status items will be injected by JavaScript -->
+                            <div class="total-status-count">
+                                Total Requests: <span id="totalRequestsCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card budget-overview-card">
+                        <div class="card-header">
+                            <h3>Budget Overview</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="budget-info">
+                                <div class="budget-item">
+                                    <span>Monthly Budget</span>
+                                    <span class="amount" id="monthlyBudget">$0</span>
+                                </div>
+                                <div class="budget-item">
+                                    <span>Used</span>
+                                    <span class="amount" id="budgetUsed">$0</span>
+                                </div>
+                                <div class="budget-item">
+                                    <span>Remaining</span>
+                                    <span class="amount text-success" id="budgetRemaining">$0</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="budgetProgressBar" style="width: 0%;"></div>
+                            </div>
+                            <div class="budget-percentage-text" id="budgetPercentageText">
+                                0% of budget used
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="performance-chart-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Regional Performance</h3>
+                        <button class="button-link">View Details</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <canvas id="regionalPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Representative Dashboard | MaintSys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Representative Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li class="active"><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request <span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Welcome Back, <span id="repWelcomeName">Representative</span>!</h1>
+                    <p class="subheader">Here's what's happening with your assignments.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- KPI Widgets Section -->
+            <section class="kpi-widgets-section">
+                <div class="kpi-card-rep">
+                    <div class="icon bg-blue"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="text">
+                        <h4 id="kpiAssignedTotal">0</h4>
+                        <p>New / Assigned</p>
+                    </div>
+                    <a href="#" class="details-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-orange"><i class="fas fa-spinner"></i></div>
+                    <div class="text">
+                        <h4 id="kpiInProgress">0</h4>
+                        <p>In Progress</p>
+                    </div>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-green"><i class="fas fa-calendar-check"></i></div>
+                    <div class="text">
+                        <h4 id="kpiCompletedToday">0</h4>
+                        <p>Completed Today</p>
+                    </div>
+                </div>
+                <div class="kpi-card-rep">
+                    <div class="icon bg-red"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="text">
+                        <h4 id="kpiOverdue">0</h4>
+                        <p>Overdue Tasks</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Dashboard Grid -->
+            <section class="dashboard-grid-rep">
+                <div class="main-panel card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list-ol"></i> Current Priority Tasks</h3>
+                        <select id="taskFilterStatus" class="form-control form-control-sm" style="max-width: 200px;">
+                            <option value="in-progress">In Progress</option>
+                            <option value="assigned">Newly Assigned</option>
+                            <option value="pending-parts">Pending Parts</option>
+                            <option value="all">All Active</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="repTasksTable" class="display compact" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Client</th>
+                                        <th>Vehicle</th>
+                                        <th>Service Type</th>
+                                        <th>Due Date</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-panel">
+                    <div class="card schedule-card">
+                        <div class="card-header"><h3><i class="fas fa-calendar-day"></i> Today's Schedule</h3></div>
+                        <div class="card-body">
+                            <ul class="schedule-list" id="todayScheduleList">
+                                <!-- Schedule items populated by JS -->
+                                <li class="no-schedule">No items scheduled for today.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card quick-actions-card">
+                        <div class="card-header"><h3><i class="fas fa-bolt"></i> Quick Actions</h3></div>
+                        <div class="card-body">
+                            <button class="btn btn-outline btn-block"><i class="fas fa-tools"></i> Log Parts Used</button>
+                            <button class="btn btn-outline btn-block mt-2"><i class="fas fa-route"></i> Optimize Route</button>
+                            <button class="btn btn-outline btn-block mt-2"><i class="fas fa-headset"></i> Request Assistance</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+             <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Task Details Modal (Example Structure - a full details page would be better) -->
+    <div id="repTaskModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h4 id="repTaskModalTitle">Task Details</h4>
+                <button class="close-btn" id="closeRepTaskModalBtn">×</button>
+            </div>
+            <div class="modal-body" id="repTaskModalBody">
+                <p>Loading task details...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelRepTaskModalBtn">Close</button>
+                <button type="button" class="btn btn-primary" id="updateTaskStatusBtn">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="representative_dashboard_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data for Representative ---
+    let repProfile = {
+        name: "John Doe",
+        avatarUrl: "https://via.placeholder.com/40?text=JD"
+    };
+
+    let repTasks = [
+        { id: 'REQ021', client: 'ABC Corporation', vehicle: 'Toyota Land Cruiser', serviceType: 'Oil Change', dueDate: '2024-07-28', priority: 'High', status: 'assigned' },
+        { id: 'REQ018', client: 'XYZ Industries', vehicle: 'Ford F-150', serviceType: 'Brake Repair', dueDate: '2024-07-29', priority: 'High', status: 'in-progress' },
+        { id: 'REQ015', client: 'Global Logistics', vehicle: 'Mercedes Sprinter', serviceType: 'Tire Rotation', dueDate: '2024-07-30', priority: 'Medium', status: 'pending-parts' },
+        { id: 'REQ012', client: 'Tech Solutions Inc', vehicle: 'Nissan Patrol', serviceType: 'Inspection', dueDate: '2024-08-01', priority: 'Low', status: 'assigned' },
+        { id: 'REQ025', client: 'City Services', vehicle: 'Garbage Truck #3', serviceType: 'Hydraulic Check', dueDate: '2024-07-27', priority: 'Medium', status: 'overdue' }, // Overdue example
+        { id: 'REQ028', client: 'Luxury Transports', vehicle: 'Limousine V1', serviceType: 'Detailing Prep', dueDate: '2024-07-28', priority: 'Low', status: 'assigned' },
+    ];
+
+    let todaySchedule = [
+        { time: '09:00', title: 'Parts Pickup for REQ021', details: 'Central Warehouse', status: 'Pending', statusClass: 'badge-warning' },
+        { time: '11:30', title: 'Service REQ018 - Ford F-150', details: 'Client Site - 123 Industrial Way', status: 'Confirmed', statusClass: 'badge-primary' },
+        { time: '14:00', title: 'Meet Client for REQ015', details: 'Global Logistics HQ', status: 'Scheduled', statusClass: 'badge-info' },
+        { time: '16:30', title: 'Final Inspection REQ012', details: 'Tech Solutions Garage', status: 'Completed', statusClass: 'badge-success' },
+    ];
+
+    // --- Helper Functions ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+
+    function updateKpiCards() {
+        const assigned = repTasks.filter(t => t.status === 'assigned' || t.status === 'pending-parts').length;
+        const inProgress = repTasks.filter(t => t.status === 'in-progress').length;
+        // For "Completed Today", you'd need more sophisticated data or logic
+        const completedToday = todaySchedule.filter(s => s.status === 'Completed').length; 
+        const overdue = repTasks.filter(t => {
+            const dueDate = new Date(t.dueDate);
+            const today = new Date();
+            today.setHours(0,0,0,0); // Compare dates only
+            return dueDate < today && t.status !== 'completed' && t.status !== 'cancelled';
+        }).length;
+
+        $('#kpiAssignedTotal').text(assigned);
+        $('#assignedTasksCountBadge').text(assigned > 0 ? assigned : '');
+        $('#kpiInProgress').text(inProgress);
+        $('#kpiCompletedToday').text(completedToday);
+        $('#kpiOverdue').text(overdue);
+        $('.notification-btn').toggleClass('has-new', overdue > 0 || assigned > 0); // Example notification logic
+    }
+
+    function populateTodaySchedule() {
+        const $list = $('#todayScheduleList');
+        $list.empty();
+        if (todaySchedule.length === 0) {
+            $list.append('<li class="no-schedule">No items scheduled for today.</li>');
+            return;
+        }
+        todaySchedule.forEach(item => {
+            $list.append(`
+                <li>
+                    <span class="time-badge">${item.time}</span>
+                    <div class="event-details">
+                        <h5>${item.title}</h5>
+                        <p>${item.details}</p>
+                        <span class="badge ${item.statusClass} event-status">${item.status}</span>
+                    </div>
+                </li>
+            `);
+        });
+    }
+
+    function loadRepProfile() {
+        $('#repSidebarAvatar').attr('src', repProfile.avatarUrl);
+        $('#repSidebarName').text(repProfile.name);
+        $('#repWelcomeName').text(repProfile.name.split(' ')[0]); // First name for welcome
+    }
+
+    // --- DataTable Initialization for Rep Tasks ---
+    const repTasksTable = $('#repTasksTable').DataTable({
+        data: repTasks,
+        columns: [
+            { data: 'id' }, { data: 'client' }, { data: 'vehicle' },
+            { data: 'serviceType' },
+            { data: 'dueDate', render: function(data) { return new Date(data).toLocaleDateString(); } },
+            { 
+                data: 'priority', 
+                render: function(data) {
+                    let badgeClass = 'badge-secondary';
+                    if (data === 'High') badgeClass = 'badge-danger';
+                    else if (data === 'Medium') badgeClass = 'badge-warning';
+                    else if (data === 'Low') badgeClass = 'badge-success'; // Green for low seems ok
+                    return `<span class="badge ${badgeClass}">${data}</span>`;
+                }
+            },
+            { 
+                data: 'status',
+                render: function(data) {
+                    let badgeClass = 'badge-info'; // Default
+                    if (data === 'assigned') badgeClass = 'badge-primary';
+                    else if (data === 'in-progress') badgeClass = 'badge-orange'; // Custom color class
+                    else if (data === 'pending-parts') badgeClass = 'badge-secondary';
+                    else if (data === 'completed') badgeClass = 'badge-success';
+                    else if (data === 'overdue') badgeClass = 'badge-danger';
+                    return `<span class="badge ${badgeClass}">${data.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>`;
+                }
+            },
+            { 
+                data: null, orderable: false, className: 'action-buttons',
+                render: function(data, type, row) {
+                    return `
+                        <button class="btn btn-icon btn-sm btn-view-task" data-id="${row.id}" title="View Details"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-icon btn-sm btn-update-status-task" data-id="${row.id}" title="Update Status"><i class="fas fa-edit"></i></button>
+                    `;
+                }
+            }
+        ],
+        responsive: true,
+        order: [[4, 'asc']], // Default sort by Due Date
+        language: { search: "_INPUT_", searchPlaceholder: "Filter tasks..." },
+        dom: 'rt<"bottom-controls"<"info-wrapper"li>p>' // Minimal controls
+    });
+
+    // --- Event Handlers ---
+    // Global search for rep tasks
+    $('#repGlobalSearch').on('keyup', function(){
+        repTasksTable.search($(this).val()).draw();
+    });
+
+    // Task filter dropdown
+    $('#taskFilterStatus').on('change', function() {
+        const status = $(this).val();
+        if (status === "all") {
+            repTasksTable.columns(6).search('').draw(); // Column index for status
+        } else {
+            // Ensure search is for exact match of the status text as rendered by DataTable
+            // This might need adjustment based on how status is formatted in the table
+             const searchString = status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            repTasksTable.columns(6).search('^' + searchString + '$', true, false).draw();
+        }
+    });
+
+
+    // Task action buttons (View, Update Status)
+    $('#repTasksTable tbody').on('click', '.btn-view-task', function() {
+        const taskId = $(this).data('id');
+        const task = repTasks.find(t => t.id === taskId);
+        // Populate and show a modal with task details
+        $('#repTaskModalTitle').text(`Details for Task: ${task.id}`);
+        $('#repTaskModalBody').html(`
+            <p><strong>Client:</strong> ${task.client}</p>
+            <p><strong>Vehicle:</strong> ${task.vehicle}</p>
+            <p><strong>Service:</strong> ${task.serviceType}</p>
+            <p><strong>Due Date:</strong> ${new Date(task.dueDate).toLocaleDateString()}</p>
+            <p><strong>Priority:</strong> ${task.priority}</p>
+            <p><strong>Status:</strong> ${task.status}</p>
+            <p><strong>Location:</strong> (Location details would go here)</p>
+            <p><strong>Notes:</strong> (Task notes would go here)</p>
+        `);
+        $('#repTaskModal').data('taskId', taskId).addClass('show');
+    });
+
+    $('#repTasksTable tbody').on('click', '.btn-update-status-task', function() {
+        const taskId = $(this).data('id');
+        // Example: Show a SweetAlert to update status
+        Swal.fire({
+            title: 'Update Task Status',
+            input: 'select',
+            inputOptions: {
+                'in-progress': 'In Progress',
+                'pending-parts': 'Pending Parts',
+                'completed': 'Completed',
+                'on-hold': 'On Hold'
+            },
+            inputPlaceholder: 'Select new status',
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            preConfirm: (newStatus) => {
+                if (!newStatus) {
+                    Swal.showValidationMessage('Please select a status');
+                }
+                return newStatus;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const newStatus = result.value;
+                const taskIndex = repTasks.findIndex(t => t.id === taskId);
+                if (taskIndex > -1) {
+                    repTasks[taskIndex].status = newStatus;
+                    repTasksTable.row(taskIndex).data(repTasks[taskIndex]).invalidate().draw(false);
+                    updateKpiCards();
+                    showToast(`Task ${taskId} status updated to ${newStatus}.`, 'success');
+                }
+            }
+        });
+    });
+    
+    // Modal close
+    $('#closeRepTaskModalBtn, #cancelRepTaskModalBtn').on('click', function() {
+        $('#repTaskModal').removeClass('show');
+    });
+    $('#repTaskModal').on('click', function(event) {
+        if (event.target === this) $(this).removeClass('show');
+    });
+
+
+    // --- Initial Load ---
+    loadRepProfile();
+    updateKpiCards();
+    populateTodaySchedule();
+    $('#taskFilterStatus').trigger('change'); // Apply initial filter to table
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', () => $sidebar.toggleClass('open'));
+    $(document).on('click', (event) => {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+        }
+    });
+});
+    </script>
+</body>
+</html>

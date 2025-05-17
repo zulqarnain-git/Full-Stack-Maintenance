@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Client Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar (Client Version) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li class="active"><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Settings</h1>
+                <p class="subheader">Manage your account, company, and preferences.</p>
+            </header>
+
+            <section class="tabs-section settings-page-tabs">
+                <div class="tabs-nav">
+                    <button class="tab-link active" data-tab="clientProfile"><i class="fas fa-user-circle"></i> Profile</button>
+                    <button class="tab-link" data-tab="clientCompany"><i class="fas fa-building"></i> Company</button>
+                    <button class="tab-link" data-tab="clientVehicles"><i class="fas fa-car"></i> Vehicles</button>
+                    <button class="tab-link" data-tab="clientNotifications"><i class="fas fa-bell"></i> Notifications</button>
+                    <button class="tab-link" data-tab="clientSecurity"><i class="fas fa-shield-alt"></i> Security</button>
+                </div>
+            </section>
+            
+            <div class="tab-content-area">
+                <!-- Profile Tab -->
+                <div id="clientProfile" class="tab-pane active">
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-header"><h3>Your Profile Information</h3></div>
+                            <div class="card-body">
+                                <form id="clientProfileForm" class="settings-form">
+                                    <div class="profile-avatar-section">
+                                        <img src="https://via.placeholder.com/100" alt="User Avatar" id="clientProfileAvatarPreview" class="profile-avatar-img">
+                                        <input type="file" id="clientProfileAvatarInput" accept="image/*" style="display:none;">
+                                        <button type="button" class="btn btn-sm btn-outline" id="clientChangeAvatarBtn"><i class="fas fa-camera"></i> Change Picture</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientProfileName">Full Name</label>
+                                        <input type="text" id="clientProfileName" class="form-control" value="Client User">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientProfileEmail">Email Address</label>
+                                        <input type="email" id="clientProfileEmail" class="form-control" value="client@example.com">
+                                    </div>
+                                     <div class="form-group">
+                                        <label for="clientProfilePhone">Phone Number</label>
+                                        <input type="tel" id="clientProfilePhone" class="form-control" value="+15559876543">
+                                    </div>
+                                     <div class="form-group">
+                                        <label for="clientProfilePosition">Position / Title</label>
+                                        <input type="text" id="clientProfilePosition" class="form-control" value="Fleet Manager">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Tab -->
+                <div id="clientCompany" class="tab-pane">
+                     <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-header"><h3>Company Details</h3></div>
+                            <div class="card-body">
+                                <form id="clientCompanyForm" class="settings-form">
+                                    <div class="form-group">
+                                        <label for="clientCompanyName">Company Name</label>
+                                        <input type="text" id="clientCompanyName" class="form-control" value="ABC Corporation">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientCompanyAddress">Company Address</label>
+                                        <textarea id="clientCompanyAddress" class="form-control" rows="3">123 Main Street, Anytown, USA</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientCompanyTaxId">Tax ID / Registration No.</label>
+                                        <input type="text" id="clientCompanyTaxId" class="form-control" value="TAX-ABC-12345">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientCompanyContactPerson">Primary Contact Person (at Company)</label>
+                                        <input type="text" id="clientCompanyContactPerson" class="form-control" value="John Smith (Logistics Head)">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Company Details</button>
+                                </form>
+                            </div>
+                        </div>
+                         <div class="card">
+                            <div class="card-header"><h3>Company Logo</h3></div>
+                             <div class="card-body">
+                                 <form id="clientLogoForm" class="settings-form">
+                                    <div class="logo-upload-area">
+                                        <img src="https://via.placeholder.com/150x50?text=Company+Logo" alt="Company Logo" id="clientCompanyLogoPreview">
+                                        <input type="file" id="clientCompanyLogoInput" accept="image/*" style="display:none;">
+                                        <button type="button" class="btn btn-sm btn-outline" id="clientChangeCompanyLogoBtn"><i class="fas fa-upload"></i> Upload New Logo</button>
+                                    </div>
+                                    <small class="text-muted">Recommended: PNG with transparent background.</small>
+                                    <button type="submit" class="btn btn-primary mt-3">Save Logo</button>
+                                 </form>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vehicles Tab -->
+                <div id="clientVehicles" class="tab-pane">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>My Vehicles</h3>
+                            <button class="btn btn-primary btn-sm" id="clientAddNewVehicleBtn"><i class="fas fa-plus"></i> Add New Vehicle</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="clientVehiclesTable" class="display compact" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Make & Model</th>
+                                            <th>Registration</th>
+                                            <th>VIN</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-outline mt-4" id="downloadFleetReportBtn"><i class="fas fa-file-download"></i> Download Fleet Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div id="clientNotifications" class="tab-pane">
+                    <div class="card">
+                         <div class="card-header"><h3>Notification Preferences</h3></div>
+                         <div class="card-body">
+                            <form id="clientNotificationSettingsForm" class="settings-form">
+                                <div class="setting-item">
+                                    <div>
+                                        <h4>Email Notifications</h4>
+                                        <p class="text-muted">Receive key updates via email.</p>
+                                    </div>
+                                    <label class="switch"><input type="checkbox" id="clientMasterEmailNotify" checked><span class="slider round"></span></label>
+                                </div>
+                                <hr class="my-3">
+                                <div id="clientEmailSubSettings">
+                                    <div class="setting-item"><p>Maintenance Request Updates</p><label class="switch"><input type="checkbox" name="clientEmailNotifyType" value="requestUpdate" checked><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Scheduled Maintenance Reminders</p><label class="switch"><input type="checkbox" name="clientEmailNotifyType" value="maintenanceReminder" checked><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Contract Renewal Notices</p><label class="switch"><input type="checkbox" name="clientEmailNotifyType" value="contractRenewal" checked><span class="slider round"></span></label></div>
+                                    <div class="setting-item"><p>Monthly Activity Reports</p><label class="switch"><input type="checkbox" name="clientEmailNotifyType" value="monthlyReport"><span class="slider round"></span></label></div>
+                                </div>
+                                <hr class="my-4">
+                                 <div class="setting-item">
+                                    <div>
+                                        <h4>In-App Notifications</h4>
+                                        <p class="text-muted">Show alerts within your client dashboard.</p>
+                                    </div>
+                                    <label class="switch"><input type="checkbox" id="clientInAppAlerts" checked><span class="slider round"></span></label>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-4">Save Notification Settings</button>
+                            </form>
+                         </div>
+                    </div>
+                </div>
+                
+                <!-- Security Tab -->
+                <div id="clientSecurity" class="tab-pane">
+                    <div class="settings-grid">
+                        <div class="card">
+                            <div class="card-header"><h3>Change Password</h3></div>
+                            <div class="card-body">
+                                <form id="clientPasswordForm" class="settings-form">
+                                    <div class="form-group">
+                                        <label for="clientCurrentPassword">Current Password</label>
+                                        <input type="password" id="clientCurrentPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientNewPassword">New Password</label>
+                                        <input type="password" id="clientNewPassword" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="clientConfirmPassword">Confirm New Password</label>
+                                        <input type="password" id="clientConfirmPassword" class="form-control" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card">
+                             <div class="card-header"><h3>Account Security</h3></div>
+                             <div class="card-body">
+                                <form class="settings-form">
+                                    <div class="setting-item">
+                                        <div>
+                                            <h4>Two-Factor Authentication (2FA)</h4>
+                                            <p class="text-muted">Add an extra layer of security to your account.</p>
+                                        </div>
+                                        <label class="switch"><input type="checkbox" id="clientEnable2FA"><span class="slider round"></span></label>
+                                    </div>
+                                     <button type="button" id="clientViewLoginActivityBtn" class="btn btn-outline mt-4"><i class="fas fa-history"></i> View Login Activity</button>
+                                </form>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Vehicle Modal (Example Structure) -->
+    <div id="clientVehicleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="clientVehicleModalTitle">Add New Vehicle</h4>
+                <button class="close-btn" id="closeClientVehicleModalBtn">×</button>
+            </div>
+            <form id="clientVehicleForm">
+                <div class="modal-body">
+                    <input type="hidden" id="clientVehicleId">
+                    <div class="form-group">
+                        <label for="vehicleMakeModel">Make & Model</label>
+                        <input type="text" id="vehicleMakeModel" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleRegistration">Registration / Plate No.</label>
+                        <input type="text" id="vehicleRegistration" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleVin">VIN Number</label>
+                        <input type="text" id="vehicleVin" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType" class="form-control">
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Truck">Truck</option>
+                            <option value="Van">Van</option>
+                            <option value="Bus">Bus</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleStatus">Status</label>
+                        <select id="vehicleStatus" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="maintenance">Under Maintenance</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelClientVehicleBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveClientVehicleBtn">Save Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="client_settings_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Initial State (Simulated - load from backend in real app) ---
+    let clientUserProfile = {
+        name: "Client User",
+        email: "client@example.com",
+        phone: "+15559876543",
+        position: "Fleet Manager",
+        avatarUrl: "https://via.placeholder.com/100?text=C" // Default client avatar
+    };
+    let clientCompanyProfile = {
+        companyName: "ABC Corporation",
+        address: "123 Main Street, Anytown, USA",
+        taxId: "TAX-ABC-12345",
+        contactPerson: "John Smith (Logistics Head)",
+        logoUrl: "https://via.placeholder.com/150x50?text=Company+Logo"
+    };
+    let clientVehiclesData = [
+        { id: 1, makeModel: "Toyota Hilux (2023)", registration: "ABC-1234", vin: "VINHILUX123", type: "Truck", status: "active" },
+        { id: 2, makeModel: "Ford Ranger (2022)", registration: "XYZ-5678", vin: "VINRANGER567", type: "Truck", status: "maintenance" },
+        { id: 3, makeModel: "Mercedes Sprinter (2021)", registration: "VAN-001", vin: "VINSPRINTER001", type: "Van", status: "active" },
+    ];
+
+    // --- Helper Functions ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+
+    function loadClientProfileData() {
+        $('#clientProfileName').val(clientUserProfile.name);
+        $('#clientProfileEmail').val(clientUserProfile.email);
+        $('#clientProfilePhone').val(clientUserProfile.phone);
+        $('#clientProfilePosition').val(clientUserProfile.position);
+        $('#clientProfileAvatarPreview').attr('src', clientUserProfile.avatarUrl);
+        $('#clientSidebarUserAvatar').attr('src', clientUserProfile.avatarUrl);
+        $('#clientSidebarUserName').text(clientUserProfile.name);
+    }
+    
+    function loadClientCompanyData() {
+        $('#clientCompanyName').val(clientCompanyProfile.companyName);
+        $('#clientCompanyAddress').val(clientCompanyProfile.address);
+        $('#clientCompanyTaxId').val(clientCompanyProfile.taxId);
+        $('#clientCompanyContactPerson').val(clientCompanyProfile.contactPerson);
+        $('#clientCompanyLogoPreview').attr('src', clientCompanyProfile.logoUrl);
+        $('#sidebarCompanyName').text(clientCompanyProfile.companyName); // Update sidebar company name
+    }
+    
+    loadClientProfileData();
+    loadClientCompanyData();
+
+    // --- Tab Switching ---
+    $('.settings-page-tabs .tab-link').on('click', function() {
+        const tabId = $(this).data('tab');
+        $('.settings-page-tabs .tab-link').removeClass('active');
+        $(this).addClass('active');
+        $('.tab-content-area .tab-pane').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    // --- Client Profile Form ---
+    $('#clientProfileForm').on('submit', function(e) {
+        e.preventDefault();
+        clientUserProfile.name = $('#clientProfileName').val();
+        clientUserProfile.email = $('#clientProfileEmail').val();
+        clientUserProfile.phone = $('#clientProfilePhone').val();
+        clientUserProfile.position = $('#clientProfilePosition').val();
+        loadClientProfileData();
+        showToast('Profile updated successfully!', 'success');
+    });
+
+    $('#clientChangeAvatarBtn').on('click', () => $('#clientProfileAvatarInput').click());
+    $('#clientProfileAvatarInput').on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                clientUserProfile.avatarUrl = e.target.result;
+                loadClientProfileData();
+                showToast('Avatar preview updated. Save profile to persist.', 'info');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // --- Client Company Form ---
+    $('#clientCompanyForm').on('submit', function(e) {
+        e.preventDefault();
+        clientCompanyProfile.companyName = $('#clientCompanyName').val();
+        clientCompanyProfile.address = $('#clientCompanyAddress').val();
+        clientCompanyProfile.taxId = $('#clientCompanyTaxId').val();
+        clientCompanyProfile.contactPerson = $('#clientCompanyContactPerson').val();
+        loadClientCompanyData();
+        showToast('Company details updated successfully!', 'success');
+    });
+    
+    $('#clientChangeCompanyLogoBtn').on('click', () => $('#clientCompanyLogoInput').click());
+    $('#clientCompanyLogoInput').on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                clientCompanyProfile.logoUrl = e.target.result;
+                loadClientCompanyData();
+                showToast('Company logo preview updated. Save logo to persist.', 'info');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+    $('#clientLogoForm').on('submit', function(e){
+        e.preventDefault();
+        // Here you'd send the logo file (clientCompanyProfile.logoUrl might be base64 or a File object)
+        showToast('Company logo saved!', 'success');
+    });
+
+
+    // --- Client Vehicles Table ---
+    const clientVehiclesTable = $('#clientVehiclesTable').DataTable({
+        data: clientVehiclesData,
+        columns: [
+            { data: 'makeModel', title: 'Make & Model' },
+            { data: 'registration', title: 'Registration' },
+            { data: 'vin', title: 'VIN' },
+            { data: 'type', title: 'Type' },
+            { 
+                data: 'status', title: 'Status',
+                render: function(data) {
+                    let badgeClass = 'badge-secondary'; // Default
+                    if (data === 'active') badgeClass = 'badge-success';
+                    else if (data === 'maintenance') badgeClass = 'badge-warning';
+                    else if (data === 'inactive') badgeClass = 'badge-danger';
+                    return `<span class="badge ${badgeClass}">${data.charAt(0).toUpperCase() + data.slice(1)}</span>`;
+                }
+            },
+            { 
+                data: null, title: 'Actions', orderable: false,
+                render: function(data, type, row) {
+                    return `
+                        <button class="btn btn-icon btn-sm btn-edit-vehicle" data-id="${row.id}" title="Edit Vehicle"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-icon btn-sm btn-delete-vehicle" data-id="${row.id}" title="Delete Vehicle"><i class="fas fa-trash-alt"></i></button>
+                    `;
+                }
+            }
+        ],
+        responsive: true,
+        language: { search: "_INPUT_", searchPlaceholder: "Search vehicles..." },
+        dom: 'rt<"bottom-controls"<"info-wrapper"li>p>'
+    });
+    
+    // --- Vehicle Modal Logic ---
+    const $vehicleModal = $('#clientVehicleModal');
+    const $vehicleForm = $('#clientVehicleForm');
+
+    $('#clientAddNewVehicleBtn').on('click', function() {
+        $('#clientVehicleModalTitle').text('Add New Vehicle');
+        $vehicleForm[0].reset();
+        $('#clientVehicleId').val('');
+        $vehicleModal.addClass('show');
+    });
+
+    $('#closeClientVehicleModalBtn, #cancelClientVehicleBtn').on('click', function() {
+        $vehicleModal.removeClass('show');
+    });
+
+    $vehicleForm.on('submit', function(e) {
+        e.preventDefault();
+        const vehicleId = $('#clientVehicleId').val();
+        const vehicleData = {
+            id: vehicleId ? parseInt(vehicleId) : Date.now(),
+            makeModel: $('#vehicleMakeModel').val(),
+            registration: $('#vehicleRegistration').val(),
+            vin: $('#vehicleVin').val(),
+            type: $('#vehicleType').val(),
+            status: $('#vehicleStatus').val()
+        };
+
+        if (vehicleId) { // Edit
+            const index = clientVehiclesData.findIndex(v => v.id === parseInt(vehicleId));
+            if (index > -1) clientVehiclesData[index] = vehicleData;
+        } else { // Add
+            clientVehiclesData.push(vehicleData);
+        }
+        clientVehiclesTable.clear().rows.add(clientVehiclesData).draw();
+        $vehicleModal.removeClass('show');
+        showToast(`Vehicle ${vehicleId ? 'updated' : 'added'} successfully!`, 'success');
+    });
+    
+    $('#clientVehiclesTable tbody').on('click', '.btn-edit-vehicle', function() {
+        const vehicleId = $(this).data('id');
+        const vehicle = clientVehiclesData.find(v => v.id === vehicleId);
+        if (vehicle) {
+            $('#clientVehicleModalTitle').text('Edit Vehicle');
+            $('#clientVehicleId').val(vehicle.id);
+            $('#vehicleMakeModel').val(vehicle.makeModel);
+            $('#vehicleRegistration').val(vehicle.registration);
+            $('#vehicleVin').val(vehicle.vin);
+            $('#vehicleType').val(vehicle.type);
+            $('#vehicleStatus').val(vehicle.status);
+            $vehicleModal.addClass('show');
+        }
+    });
+
+    $('#clientVehiclesTable tbody').on('click', '.btn-delete-vehicle', function() {
+        const vehicleId = $(this).data('id');
+        const vehicle = clientVehiclesData.find(v => v.id === vehicleId);
+        Swal.fire({
+            title: 'Delete Vehicle?',
+            text: `Are you sure you want to delete "${vehicle.makeModel} (${vehicle.registration})"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                clientVehiclesData = clientVehiclesData.filter(v => v.id !== vehicleId);
+                clientVehiclesTable.clear().rows.add(clientVehiclesData).draw();
+                showToast('Vehicle deleted.', 'success');
+            }
+        });
+    });
+
+    $('#downloadFleetReportBtn').on('click', () => showToast('Fleet report download initiated.', 'info'));
+
+
+    // --- Client Notification Settings ---
+    $('#clientNotificationSettingsForm').on('submit', function(e) {
+        e.preventDefault();
+        const masterEmail = $('#clientMasterEmailNotify').is(':checked');
+        let emailTypes = [];
+        if (masterEmail) {
+            $('input[name="clientEmailNotifyType"]:checked').each(function() { emailTypes.push($(this).val()); });
+        }
+        const inAppAlerts = $('#clientInAppAlerts').is(':checked');
+        console.log("Saving client notification settings:", { masterEmail, emailTypes, inAppAlerts });
+        showToast('Notification settings saved!', 'success');
+    });
+    $('#clientMasterEmailNotify').on('change', function() {
+        $('#clientEmailSubSettings input[type="checkbox"]').prop('disabled', !this.checked).prop('checked', this.checked); // Also check/uncheck subs
+        $('#clientEmailSubSettings').css('opacity', this.checked ? 1 : 0.5);
+    }).trigger('change');
+
+
+    // --- Client Security Form (Password) ---
+    $('#clientPasswordForm').on('submit', function(e) {
+        e.preventDefault();
+        const currentPass = $('#clientCurrentPassword').val();
+        const newPass = $('#clientNewPassword').val();
+        const confirmPass = $('#clientConfirmPassword').val();
+
+        if (newPass !== confirmPass) {
+            showToast('New passwords do not match.', 'error'); return;
+        }
+        if (newPass.length < 8) { // Example minimum length
+             showToast('New password must be at least 8 characters.', 'error'); return;
+        }
+        console.log("Attempting client password change:", { currentPass, newPass });
+        showToast('Password updated successfully!', 'success');
+        this.reset();
+    });
+    
+    $('#clientEnable2FA').on('change', function(){
+        showToast(`Two-Factor Authentication ${this.checked ? 'Enabled' : 'Disabled'}.`, 'info');
+    });
+    $('#clientViewLoginActivityBtn').on('click', () => showToast('Login activity would be displayed here or sent via email.', 'info'));
+
+
+    // --- Modal general close on backdrop click ---
+    $('.modal').on('click', function(event) {
+        if (event.target === this) { $(this).removeClass('show'); }
+    });
+
+    // --- Sidebar Toggle (same as other pages) ---
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', () => $sidebar.toggleClass('open'));
+    $(document).on('click', (event) => {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+        }
+    });
+});
+    </script>
+</body>
+</html>

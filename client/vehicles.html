@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vehicles | MaintSys Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <!-- Client Sidebar (Assume same, with "My Vehicles" active) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li class="active"><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>My Vehicles</h1>
+                <div class="topbar-actions">
+                    <input type="text" id="searchVehiclesInput" class="form-control form-control-sm topbar-search" placeholder="Search vehicles...">
+                    <button class="btn btn-primary" id="openAddVehicleModalBtn">
+                        <i class="fas fa-plus"></i> Add Vehicle
+                    </button>
+                </div>
+            </header>
+            <p class="subheader">Manage your registered vehicles and request services.</p>
+
+            <section class="vehicles-grid-section">
+                <div class="vehicle-grid-container" id="vehicleGridContainer">
+                    <!-- Vehicle cards will be populated by JS -->
+                    <!-- Placeholder for "Add New" can also be a static card -->
+                </div>
+                <div id="noVehiclesMessage" class="no-items-message" style="display: none;">
+                    <i class="fas fa-car-side fa-3x text-muted"></i>
+                    <p>No vehicles registered yet.</p>
+                    <button class="btn btn-primary mt-2" id="addFirstVehicleBtn"><i class="fas fa-plus"></i> Add Your First Vehicle</button>
+                </div>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Vehicle -->
+    <div id="vehicleModal" class="modal">
+        <div class="modal-content modal-md"> <!-- Slightly smaller modal for vehicle form -->
+            <div class="modal-header">
+                <h4 id="vehicleModalTitle">Add New Vehicle</h4>
+                <button class="close-btn" id="closeVehicleModalBtn">×</button>
+            </div>
+            <form id="vehicleForm">
+                <div class="modal-body">
+                    <input type="hidden" id="vehicleId" name="id">
+                    <div class="vehicle-form-grid">
+                        <div class="form-group full-span">
+                            <label for="vehicleIdentifier">Vehicle Identifier (e.g., Truck #1, Rego) <span class="required-asterisk">*</span></label>
+                            <input type="text" id="vehicleIdentifier" name="identifier" class="form-control" required>
+                             <small class="error-message" data-for="vehicleIdentifier"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleMake">Make (e.g., Toyota) <span class="required-asterisk">*</span></label>
+                            <input type="text" id="vehicleMake" name="make" class="form-control" required>
+                            <small class="error-message" data-for="vehicleMake"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleModel">Model (e.g., Hilux) <span class="required-asterisk">*</span></label>
+                            <input type="text" id="vehicleModel" name="model" class="form-control" required>
+                            <small class="error-message" data-for="vehicleModel"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleYear">Year</label>
+                            <input type="number" id="vehicleYear" name="year" class="form-control" min="1900" placeholder="e.g., 2020">
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleColor">Color</label>
+                            <input type="text" id="vehicleColor" name="color" class="form-control" placeholder="e.g., Blue">
+                        </div>
+                        <div class="form-group full-span">
+                            <label for="vehicleVIN">VIN (Vehicle Identification Number)</label>
+                            <input type="text" id="vehicleVIN" name="vin" class="form-control" placeholder="17-character VIN">
+                        </div>
+                         <div class="form-group full-span">
+                            <label for="vehicleNotes">Additional Notes</label>
+                            <textarea id="vehicleNotes" name="notes" class="form-control" rows="2" placeholder="e.g., Specific features, known minor issues..."></textarea>
+                        </div>
+                        <div class="form-group full-span">
+                            <label for="vehicleImageUpload">Vehicle Image (Optional)</label>
+                            <div class="vehicle-image-upload-preview">
+                                <img src="https://via.placeholder.com/150x100?text=No+Image" alt="Vehicle Preview" id="vehicleImagePreview">
+                                <input type="file" id="vehicleImageUpload" name="imageFile" class="form-control-file" accept="image/*">
+                                <button type="button" class="btn btn-sm btn-outline" id="triggerImageUpload"><i class="fas fa-upload"></i> Choose Image</button>
+                            </div>
+                            <small class="text-muted">Max 2MB. JPG, PNG, GIF.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger mr-auto" id="deleteVehicleBtn" style="display: none;"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <button type="button" class="btn btn-secondary" id="cancelVehicleModalBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveVehicleBtn">Save Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="client_vehicles_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data (Replace with actual data fetching) ---
+    let clientVehicles = [
+        { id: 'VEH001', identifier: 'Work Truck 1', make: 'Toyota', model: 'Hilux', year: 2021, color: 'Red', vin: 'ABC123XYZ789', notes: 'Equipped with toolbox.', imageUrl: 'https://via.placeholder.com/300x200/FF0000/FFFFFF?Text=Hilux', lastService: '2024-03-15', status: 'Good' },
+        { id: 'VEH002', identifier: 'Delivery Van', make: 'Ford', model: 'Transit', year: 2022, color: 'White', vin: 'DEF456UVW123', notes: 'Refrigerated unit.', imageUrl: 'https://via.placeholder.com/300x200/FFFFFF/000000?Text=Transit', lastService: '2024-04-20', status: 'Attention Needed' },
+        { id: 'VEH003', identifier: 'Manager Car (SED003)', make: 'Honda', model: 'Civic', year: 2023, color: 'Blue', vin: 'GHI789RST456', notes: '', imageUrl: null, lastService: '2024-05-01', status: 'Good' }
+    ];
+
+    const $vehicleGridContainer = $('#vehicleGridContainer');
+    const $vehicleModal = $('#vehicleModal');
+    const $vehicleForm = $('#vehicleForm');
+    const $noVehiclesMessage = $('#noVehiclesMessage');
+
+    // --- Helper Functions ---
+    function showToast(message, type = 'info') { /* ... same as previous ... */ }
+    function getStatusBadgeClass(status) {
+        if (status === 'Good') return 'good';
+        if (status === 'Attention Needed') return 'attention';
+        if (status === 'Critical') return 'critical';
+        return '';
+    }
+    function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        return new Date(dateStr).toLocaleDateString();
+    }
+
+    // --- Render Vehicle Cards ---
+    function renderVehicleCards(vehiclesToRender = clientVehicles) {
+        $vehicleGridContainer.empty();
+        if (vehiclesToRender.length === 0) {
+            $noVehiclesMessage.show();
+            // Optionally, still show the "Add New" placeholder card if desired
+            appendAddNewPlaceholder();
+            return;
+        }
+        $noVehiclesMessage.hide();
+
+        vehiclesToRender.forEach(vehicle => {
+            const imageHtml = vehicle.imageUrl 
+                ? `<img src="${vehicle.imageUrl}" alt="${vehicle.identifier}" class="vehicle-image">`
+                : `<div class="vehicle-image-placeholder"><i class="fas fa-car"></i></div>`;
+            
+            const cardHtml = `
+                <div class="vehicle-card" data-id="${vehicle.id}">
+                    ${imageHtml}
+                    <div class="card-body">
+                        <h3 class="vehicle-name">${vehicle.identifier}</h3>
+                        <p class="vehicle-model">${vehicle.make || ''} ${vehicle.model || ''} (${vehicle.year || 'N/A'})</p>
+                        <ul class="vehicle-details-list">
+                            ${vehicle.vin ? `<li><i class="fas fa-barcode"></i>VIN: <strong>${vehicle.vin}</strong></li>` : ''}
+                            <li><i class="fas fa-palette"></i>Color: <strong>${vehicle.color || 'N/A'}</strong></li>
+                            <li><i class="fas fa-calendar-check"></i>Last Service: <strong>${formatDate(vehicle.lastService)}</strong></li>
+                            <li><i class="fas fa-heartbeat"></i>Status: <span class="vehicle-status-badge ${getStatusBadge(vehicle.status)}">${vehicle.status || 'Unknown'}</span></li>
+                        </ul>
+                        ${vehicle.notes ? `<p class="text-muted small mt-2"><em>Notes: ${vehicle.notes}</em></p>` : ''}
+                    </div>
+                    <div class="card-footer vehicle-actions">
+                        <a href="client_new_request.html?vehicleId=${vehicle.id}" class="btn btn-sm btn-primary"><i class="fas fa-tools"></i> Request Service</a>
+                        <button class="btn btn-sm btn-icon btn-edit" title="Edit Vehicle"><i class="fas fa-edit"></i></button>
+                    </div>
+                </div>
+            `;
+            $vehicleGridContainer.append(cardHtml);
+        });
+        appendAddNewPlaceholder(); // Always add the placeholder at the end
+    }
+    
+    function appendAddNewPlaceholder() {
+         const placeholderHtml = `
+            <div class="vehicle-card add-vehicle-placeholder-card" id="addVehiclePlaceholderCard">
+                <div class="add-icon"><i class="fas fa-plus-circle"></i></div>
+                <p>Add New Vehicle</p>
+            </div>
+        `;
+        $vehicleGridContainer.append(placeholderHtml);
+    }
+
+
+    // --- Modal Handling ---
+    function openVehicleModal(vehicle = null) {
+        $vehicleForm[0].reset();
+        $('#vehicleImagePreview').attr('src', 'https://via.placeholder.com/150x100?text=No+Image');
+        $('.error-message').text(''); // Clear previous errors
+        $('input, textarea, select').removeClass('is-invalid');
+
+        if (vehicle) { // Editing
+            $('#vehicleModalTitle').text('Edit Vehicle');
+            $('#vehicleId').val(vehicle.id);
+            $('#vehicleIdentifier').val(vehicle.identifier);
+            $('#vehicleMake').val(vehicle.make);
+            $('#vehicleModel').val(vehicle.model);
+            $('#vehicleYear').val(vehicle.year);
+            $('#vehicleColor').val(vehicle.color);
+            $('#vehicleVIN').val(vehicle.vin);
+            $('#vehicleNotes').val(vehicle.notes);
+            if (vehicle.imageUrl) {
+                $('#vehicleImagePreview').attr('src', vehicle.imageUrl);
+            }
+            $('#deleteVehicleBtn').show();
+        } else { // Adding
+            $('#vehicleModalTitle').text('Add New Vehicle');
+            $('#vehicleId').val('');
+            $('#deleteVehicleBtn').hide();
+        }
+        $vehicleModal.addClass('show');
+    }
+
+    $('#openAddVehicleModalBtn, #addFirstVehicleBtn').on('click', () => openVehicleModal());
+    $vehicleGridContainer.on('click', '#addVehiclePlaceholderCard', () => openVehicleModal());
+
+    $('#closeVehicleModalBtn, #cancelVehicleModalBtn').on('click', () => $vehicleModal.removeClass('show'));
+    $vehicleModal.on('click', function(event) { if (event.target === this) $vehicleModal.removeClass('show'); });
+    $(document).on('keyup', function(e) { if (e.key === "Escape") $vehicleModal.removeClass('show'); });
+
+    // Trigger file input for image
+    $('#triggerImageUpload').on('click', () => $('#vehicleImageUpload').click());
+    $('#vehicleImageUpload').on('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => $('#vehicleImagePreview').attr('src', e.target.result);
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // --- Form Submission (Add/Edit Vehicle) ---
+    function validateVehicleField(fieldId, condition, errorMessage) {
+        const $field = $('#' + fieldId);
+        const $errorMsg = $(`.error-message[data-for="${fieldId}"]`); // Assuming error messages have data-for
+        if (!$errorMsg.length) { // If no specific error message element, log and skip
+             // console.warn("No error message element for field: " + fieldId);
+             if (!condition) { $field.addClass('is-invalid'); } else { $field.removeClass('is-invalid');}
+             return condition;
+        }
+        if (condition) {
+            $field.removeClass('is-invalid');
+            $errorMsg.text('');
+            return true;
+        } else {
+            $field.addClass('is-invalid');
+            $errorMsg.text(errorMessage);
+            return false;
+        }
+    }
+
+
+    $vehicleForm.on('submit', function(e) {
+        e.preventDefault();
+        let isValid = true;
+        isValid = validateVehicleField('vehicleIdentifier', $('#vehicleIdentifier').val().trim() !== '', 'Identifier is required.') && isValid;
+        isValid = validateVehicleField('vehicleMake', $('#vehicleMake').val().trim() !== '', 'Make is required.') && isValid;
+        isValid = validateVehicleField('vehicleModel', $('#vehicleModel').val().trim() !== '', 'Model is required.') && isValid;
+        
+        if(!isValid) {
+            showToast("Please correct the errors in the form.", "error");
+            return;
+        }
+
+
+        const vehicleId = $('#vehicleId').val();
+        const formData = {
+            id: vehicleId || `VEH${Date.now().toString().slice(-4)}`, // Generate new ID if not present
+            identifier: $('#vehicleIdentifier').val(),
+            make: $('#vehicleMake').val(),
+            model: $('#vehicleModel').val(),
+            year: $('#vehicleYear').val() ? parseInt($('#vehicleYear').val()) : null,
+            color: $('#vehicleColor').val(),
+            vin: $('#vehicleVIN').val(),
+            notes: $('#vehicleNotes').val(),
+            // For image, in real app you'd handle file upload to server
+            // Here, we'll just use the preview URL if it's a data URL, or keep existing if editing.
+            imageUrl: ($('#vehicleImagePreview').attr('src').startsWith('data:image') ? $('#vehicleImagePreview').attr('src') : (vehicleId ? clientVehicles.find(v=>v.id === vehicleId)?.imageUrl : null)),
+            lastService: vehicleId ? clientVehicles.find(v=>v.id === vehicleId)?.lastService : null, // Preserve last service
+            status: vehicleId ? clientVehicles.find(v=>v.id === vehicleId)?.status : 'Good' // Preserve status or default
+        };
+
+        if (vehicleId) { // Editing
+            const index = clientVehicles.findIndex(v => v.id === vehicleId);
+            if (index > -1) clientVehicles[index] = formData;
+        } else { // Adding
+            clientVehicles.push(formData);
+        }
+        
+        renderVehicleCards();
+        $vehicleModal.removeClass('show');
+        showToast(`Vehicle ${vehicleId ? 'updated' : 'added'} successfully!`, 'success');
+    });
+
+    // Edit Vehicle Button on Card
+    $vehicleGridContainer.on('click', '.btn-edit', function() {
+        const vehicleId = $(this).closest('.vehicle-card').data('id');
+        const vehicle = clientVehicles.find(v => v.id === vehicleId);
+        if (vehicle) {
+            openVehicleModal(vehicle);
+        }
+    });
+
+    // Delete Vehicle
+    $('#deleteVehicleBtn').on('click', function() {
+        const vehicleId = $('#vehicleId').val();
+        const vehicle = clientVehicles.find(v => v.id === vehicleId);
+        if (!vehicle) return;
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to delete "${vehicle.identifier}"? This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                clientVehicles = clientVehicles.filter(v => v.id !== vehicleId);
+                renderVehicleCards();
+                $vehicleModal.removeClass('show');
+                Swal.fire('Deleted!', `Vehicle "${vehicle.identifier}" has been removed.`, 'success');
+            }
+        });
+    });
+    
+    // --- Search Vehicles ---
+    $('#searchVehiclesInput').on('keyup', function() {
+        const searchTerm = $(this).val().toLowerCase();
+        const filtered = clientVehicles.filter(v => 
+            (v.identifier && v.identifier.toLowerCase().includes(searchTerm)) ||
+            (v.make && v.make.toLowerCase().includes(searchTerm)) ||
+            (v.model && v.model.toLowerCase().includes(searchTerm)) ||
+            (v.vin && v.vin.toLowerCase().includes(searchTerm))
+        );
+        renderVehicleCards(filtered);
+    });
+
+
+    // --- Initial Load ---
+    renderVehicleCards();
+
+    // --- Sidebar Toggle & Other UI (same as previous client pages) ---
+    const $sidebar = $('.sidebar-client');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        $('.dashboard-container').toggleClass('sidebar-collapsed-client');
+    });
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+            $('.dashboard-container').removeClass('sidebar-collapsed-client');
+        }
+    });
+});
+    </script>
+</body>
+</html>

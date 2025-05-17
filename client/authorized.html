@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorized Persons | MaintSys Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <!-- Client Sidebar (Assume same, with "Authorized Persons" active) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li class="active"><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Authorized Persons</h1>
+                <div class="topbar-actions">
+                     <input type="text" id="searchAuthPersons" class="form-control form-control-sm topbar-search" placeholder="Search persons...">
+                    <button class="btn btn-primary" id="openAddAuthPersonModalBtn">
+                        <i class="fas fa-user-plus"></i> Add New Person
+                    </button>
+                </div>
+            </header>
+            <p class="subheader">Manage individuals authorized to act on your behalf for maintenance requests.</p> <br>
+
+            <section class="table-section card">
+                <div class="card-header">
+                    <h2>Listed Authorized Persons</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="authorizedPersonsTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role/Department</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noAuthPersonsMessage" class="no-items-message p-4" style="display: none;">
+                        <i class="fas fa-users-slash fa-3x text-muted"></i>
+                        <p>No authorized persons have been added yet.</p>
+                        <button class="btn btn-primary mt-2" id="addFirstAuthPersonBtn"><i class="fas fa-user-plus"></i> Add First Person</button>
+                    </div>
+                </div>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Modal for Add/Edit Authorized Person -->
+    <div id="authPersonModal" class="modal">
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <h4 id="authPersonModalTitle">Add New Authorized Person</h4>
+                <button class="close-btn" id="closeAuthPersonModalBtn">×</button>
+            </div>
+            <form id="authPersonForm">
+                <div class="modal-body">
+                    <input type="hidden" id="authPersonId" name="id">
+                    <div class="form-group">
+                        <label for="authPersonName">Full Name <span class="required-asterisk">*</span></label>
+                        <input type="text" id="authPersonName" name="name" class="form-control" required>
+                        <small class="error-message" data-for="authPersonName"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="authPersonEmail">Email Address</label>
+                        <input type="email" id="authPersonEmail" name="email" class="form-control" placeholder="e.g., user@example.com">
+                        <small class="error-message" data-for="authPersonEmail"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="authPersonPhone">Phone Number</label>
+                        <input type="tel" id="authPersonPhone" name="phone" class="form-control" placeholder="e.g., (555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label for="authPersonRole">Role/Department (Optional)</label>
+                        <input type="text" id="authPersonRole" name="role" class="form-control" placeholder="e.g., Logistics Manager, Site Supervisor">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelAuthPersonModalBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveAuthPersonBtn">Save Person</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="client_authorized_script.js"></script>
+    <script>$(document).ready(function() {
+        // --- Mock Data (Replace with actual data fetching) ---
+        let clientAuthorizedPersons = [
+            { id: 'AUTH001', name: 'Johnathan Doe', email: 'john.doe@clientcorp.com', phone: '(555) 123-4567', role: 'Logistics Manager' },
+            { id: 'AUTH002', name: 'Alice Smitherson', email: 'alice.s@clientcorp.com', phone: '(555) 987-6543', role: 'Site Supervisor A' },
+            { id: 'AUTH003', name: 'Robert Brown', email: 'rob.brown@clientcorp.com', phone: '(555) 555-1212', role: 'Procurement Officer' }
+        ];
+    
+        let authorizedPersonsTable; // DataTable instance
+        const $authPersonModal = $('#authPersonModal');
+        const $authPersonForm = $('#authPersonForm');
+        const $noAuthPersonsMessage = $('#noAuthPersonsMessage');
+    
+        // --- Helper Functions ---
+        function showToast(message, type = 'info') {
+            const $toast = $('#toastNotification');
+            const $toastMessage = $('#toastMessage');
+            $toastMessage.text(message);
+            $toast.removeClass('success error info warning').addClass(type).addClass('show');
+            setTimeout(() => $toast.removeClass('show'), 3500);
+        }
+    
+        // --- Initialize/Render DataTable ---
+        function renderAuthorizedPersonsTable() {
+            if (clientAuthorizedPersons.length === 0) {
+                $noAuthPersonsMessage.show();
+                if ($.fn.DataTable.isDataTable('#authorizedPersonsTable')) {
+                     $('#authorizedPersonsTable').DataTable().clear().draw(); // Clear table if it exists
+                }
+                $('#authorizedPersonsTable').parent().hide(); // Hide table wrapper
+                return;
+            }
+            
+            $noAuthPersonsMessage.hide();
+            $('#authorizedPersonsTable').parent().show();
+    
+    
+            if ($.fn.DataTable.isDataTable('#authorizedPersonsTable')) {
+                authorizedPersonsTable.clear().rows.add(clientAuthorizedPersons).draw();
+            } else {
+                authorizedPersonsTable = $('#authorizedPersonsTable').DataTable({
+                    data: clientAuthorizedPersons,
+                    columns: [
+                        { data: 'name', className: 'font-medium' },
+                        { data: 'email', defaultContent: '<em class="text-muted">N/A</em>' },
+                        { data: 'phone', defaultContent: '<em class="text-muted">N/A</em>' },
+                        { data: 'role', defaultContent: '<em class="text-muted">N/A</em>' },
+                        {
+                            data: null,
+                            orderable: false,
+                            className: 'action-buttons text-center',
+                            render: function(data, type, row) {
+                                return `
+                                    <button class="btn btn-icon btn-edit" title="Edit Person" data-id="${row.id}"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-icon btn-icon-danger btn-delete" title="Remove Person" data-id="${row.id}"><i class="fas fa-trash-alt"></i></button>
+                                `;
+                            }
+                        }
+                    ],
+                    responsive: true,
+                    language: {
+                        search: "_INPUT_", searchPlaceholder: "Filter in table...", // Applied by topbar search
+                        lengthMenu: "Show _MENU_", info: "Showing _START_ to _END_ of _TOTAL_ persons",
+                        paginate: { previous: "<i class='fas fa-chevron-left'></i>", next: "<i class='fas fa-chevron-right'></i>" },
+                        emptyTable: "No authorized persons found." // Used if initial data is empty after filters
+                    },
+                    dom: 'rt<"bottom-controls"<"info-wrapper"li><"table-pagination"p>>',
+                    pageLength: 10,
+                    order: [[0, 'asc']] // Default sort by name
+                });
+            }
+        }
+        
+        // Custom search bar for the table
+        $('#searchAuthPersons').on('keyup', function() {
+            if(authorizedPersonsTable) {
+                authorizedPersonsTable.search($(this).val()).draw();
+            }
+        });
+    
+    
+        // --- Modal Handling ---
+        function openAuthPersonModal(person = null) {
+            $authPersonForm[0].reset();
+            $('.error-message').text('');
+            $('input, textarea, select').removeClass('is-invalid');
+    
+            if (person) { // Editing
+                $('#authPersonModalTitle').text('Edit Authorized Person');
+                $('#authPersonId').val(person.id);
+                $('#authPersonName').val(person.name);
+                $('#authPersonEmail').val(person.email);
+                $('#authPersonPhone').val(person.phone);
+                $('#authPersonRole').val(person.role);
+            } else { // Adding
+                $('#authPersonModalTitle').text('Add New Authorized Person');
+                $('#authPersonId').val(''); // Clear ID for new entry
+            }
+            $authPersonModal.addClass('show');
+        }
+    
+        $('#openAddAuthPersonModalBtn, #addFirstAuthPersonBtn').on('click', () => openAuthPersonModal());
+        $('#closeAuthPersonModalBtn, #cancelAuthPersonModalBtn').on('click', () => $authPersonModal.removeClass('show'));
+        $authPersonModal.on('click', function(event) { if (event.target === this) $authPersonModal.removeClass('show'); });
+        $(document).on('keyup', function(e) { if (e.key === "Escape") $authPersonModal.removeClass('show'); });
+    
+        // --- Form Validation ---
+        function validateAuthField(fieldId, condition, errorMessage) {
+            const $field = $('#' + fieldId);
+            const $errorMsg = $(`.error-message[data-for="${fieldId}"]`);
+            if (condition) {
+                $field.removeClass('is-invalid');
+                $errorMsg.text('');
+                return true;
+            } else {
+                $field.addClass('is-invalid');
+                $errorMsg.text(errorMessage);
+                return false;
+            }
+        }
+        function clearAuthErrorFor(fieldId) {
+            $('#' + fieldId).removeClass('is-invalid');
+            $(`.error-message[data-for="${fieldId}"]`).text('');
+        }
+         $('#authPersonForm input').on('input', function() {
+            clearAuthErrorFor($(this).attr('id'));
+        });
+    
+        // --- Form Submission (Add/Edit Person) ---
+        $authPersonForm.on('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+            isValid = validateAuthField('authPersonName', $('#authPersonName').val().trim() !== '', 'Full name is required.') && isValid;
+            const emailVal = $('#authPersonEmail').val().trim();
+            if (emailVal && !/^\S+@\S+\.\S+$/.test(emailVal)) { // Simple email regex
+                 isValid = validateAuthField('authPersonEmail', false, 'Please enter a valid email address.') && isValid;
+            } else {
+                clearAuthErrorFor('authPersonEmail');
+            }
+    
+            if (!isValid) {
+                showToast('Please correct the errors in the form.', 'error');
+                return;
+            }
+    
+            const personId = $('#authPersonId').val();
+            const personData = {
+                id: personId || `AUTH${Date.now().toString().slice(-5)}`,
+                name: $('#authPersonName').val().trim(),
+                email: emailVal || null,
+                phone: $('#authPersonPhone').val().trim() || null,
+                role: $('#authPersonRole').val().trim() || null,
+            };
+    
+            if (personId) { // Editing
+                const index = clientAuthorizedPersons.findIndex(p => p.id === personId);
+                if (index > -1) clientAuthorizedPersons[index] = personData;
+            } else { // Adding
+                clientAuthorizedPersons.push(personData);
+            }
+            
+            renderAuthorizedPersonsTable();
+            $authPersonModal.removeClass('show');
+            showToast(`Person ${personId ? 'updated' : 'added'} successfully!`, 'success');
+        });
+    
+        // --- Edit/Delete Actions from Table ---
+        $('#authorizedPersonsTable tbody').on('click', '.btn-edit', function() {
+            const personId = $(this).data('id');
+            const person = clientAuthorizedPersons.find(p => p.id === personId);
+            if (person) openAuthPersonModal(person);
+        });
+    
+        $('#authorizedPersonsTable tbody').on('click', '.btn-delete', function() {
+            const personId = $(this).data('id');
+            const person = clientAuthorizedPersons.find(p => p.id === personId);
+            if (!person) return;
+    
+            Swal.fire({
+                title: 'Are you sure?',
+                html: `Do you want to remove <strong>${person.name}</strong> from authorized persons?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, remove them!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    clientAuthorizedPersons = clientAuthorizedPersons.filter(p => p.id !== personId);
+                    renderAuthorizedPersonsTable();
+                    Swal.fire('Removed!', `${person.name} has been removed.`, 'success');
+                }
+            });
+        });
+    
+    
+        // --- Initial Load ---
+        renderAuthorizedPersonsTable();
+    
+        // --- Sidebar Toggle & Other UI (same as previous client pages) ---
+        const $sidebar = $('.sidebar-client');
+        $('#sidebarToggle').on('click', function() {
+            $sidebar.toggleClass('open');
+            $('.dashboard-container').toggleClass('sidebar-collapsed-client');
+        });
+        $(document).on('click', function(event) {
+            if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+                $('.dashboard-container').removeClass('sidebar-collapsed-client');
+            }
+        });
+    });</script>
+</body>
+</html>

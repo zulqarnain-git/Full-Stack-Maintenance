@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaintSys - Welcome</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <!-- Specific styles for homepage if needed -->
+    <link rel="stylesheet" href="assets/css/landing.css"> <!-- We'll create this later -->
+    <link rel="icon" href="assets/img/logo-icon.svg" type="image/svg+xml">
+</head>
+<body>
+    <header class="landing-header">
+        <nav class="container">
+            <a href="index.html" class="logo">
+                <img src="assets/img/logo.svg" alt="MaintSys Logo">
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="auth/login.html" class="btn btn-outline">Login</a></li>
+                <li><a href="auth/register.html" class="btn btn-primary">Sign Up</a></li>
+            </ul>
+            <button class="mobile-nav-toggle" aria-label="Open navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="container hero-content">
+                <h1>Streamline Your Maintenance Operations</h1>
+                <p>Efficiently manage contracts, requests, and reports with our all-in-one Maintenance Management System.</p>
+                <div class="hero-actions">
+                    <a href="auth/register.html" class="btn btn-primary btn-lg">Get Started</a>
+                    <a href="#how-it-works" class="btn btn-secondary btn-lg">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image-container">
+                <!-- Placeholder for a graphic or illustration -->
+                <img src="assets/img/hero-bg.svg" alt="Maintenance System Illustration" class="hero-image">
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <div class="container">
+                <h2>Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <img src="assets/img/icons/contract.svg" alt="Contract Management" class="feature-icon">
+                        <h3>Contract Management</h3>
+                        <p>Easily upload, edit, and assign contracts to clients.</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="assets/img/icons/request.svg" alt="Maintenance Requests" class="feature-icon">
+                        <h3>Maintenance Requests</h3>
+                        <p>Clients submit requests, admins approve, reps fulfill.</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="assets/img/icons/budget.svg" alt="Budget Tracking" class="feature-icon"> <!-- Create budget.svg -->
+                        <h3>Budget Tracking</h3>
+                        <p>Set and monitor monthly budgets per client/contract.</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="assets/img/icons/whatsapp.svg" alt="WhatsApp Alerts" class="feature-icon">
+                        <h3>WhatsApp Alerts</h3>
+                        <p>Real-time notifications for every step of the process.</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="assets/img/icons/reports.svg" alt="Reporting" class="feature-icon">
+                        <h3>Comprehensive Reports</h3>
+                        <p>Detailed analytics for admins, clients, and reps.</p>
+                    </div>
+                     <div class="feature-item">
+                        <img src="assets/img/icons/regional.svg" alt="Regional Management" class="feature-icon"> <!-- Create regional.svg -->
+                        <h3>Regional Management</h3>
+                        <p>Assign representatives by region and auto-assign requests.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works-section">
+            <div class="container">
+                <h2>How It Works</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h3>Admin Sets Up</h3>
+                        <p>Uploads contracts, defines budgets, assigns representatives.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h3>Client Submits Request</h3>
+                        <p>Fills out a maintenance form with vehicle and part details.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h3>Admin Reviews</h3>
+                        <p>Approves or rejects the request, forwards to a representative.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <h3>Representative Acts</h3>
+                        <p>Delivers parts, supervises installation, uploads documents.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">5</div>
+                        <h3>System Notifies</h3>
+                        <p>WhatsApp alerts keep everyone informed at each stage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing-section">
+            <div class="container">
+                <h2>Choose Your Plan</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-plan">
+                        <h3>Basic</h3>
+                        <p class="price"><sup>$</sup>49<span>/mo</span></p>
+                        <ul>
+                            <li>Up to 10 Users</li>
+                            <li>500 Maintenance Requests</li>
+                            <li>Basic Reporting</li>
+                            <li>Email Support</li>
+                        </ul>
+                        <a href="auth/register.html?plan=basic" class="btn btn-primary">Select Plan</a>
+                    </div>
+                    <div class="pricing-plan recommended">
+                        <h3>Pro</h3>
+                        <p class="price"><sup>$</sup>99<span>/mo</span></p>
+                        <span class="badge">Most Popular</span>
+                        <ul>
+                            <li>Up to 50 Users</li>
+                            <li>Unlimited Requests</li>
+                            <li>Advanced Reporting & Analytics</li>
+                            <li>WhatsApp Integration</li>
+                            <li>Priority Support</li>
+                        </ul>
+                        <a href="auth/register.html?plan=pro" class="btn btn-primary">Select Plan</a>
+                    </div>
+                    <div class="pricing-plan">
+                        <h3>Enterprise</h3>
+                        <p class="price">Custom</p>
+                        <ul>
+                            <li>Unlimited Users</li>
+                            <li>Custom Features</li>
+                            <li>Dedicated Account Manager</li>
+                            <li>On-Premise Option</li>
+                        </ul>
+                        <a href="#contact" class="btn btn-primary">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta" class="cta-section">
+            <div class="container">
+                <h2>Ready to Transform Your Maintenance Workflow?</h2>
+                <p>Join hundreds of businesses optimizing their operations with MaintSys.</p>
+                <a href="auth/register.html" class="btn btn-light btn-lg">Sign Up for Free Trial</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="landing-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/img/logo.svg" alt="MaintSys Logo">
+                    <p>&copy; <span id="current-year"></span> MaintSys. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="auth/login.html">Login</a></li>
+                        <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="/terms-of-service.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Connect With Us</h4>
+                    <!-- Add social media icons here -->
+                    <a href="#" aria-label="Facebook"><img src="assets/img/icons/facebook.svg" alt="Facebook"></a>
+                    <a href="#" aria-label="Twitter"><img src="assets/img/icons/twitter.svg" alt="Twitter"></a>
+                    <a href="#" aria-label="LinkedIn"><img src="assets/img/icons/linkedin.svg" alt="LinkedIn"></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        // Basic mobile nav toggle
+        const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (mobileNavToggle && navLinks) {
+            mobileNavToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                mobileNavToggle.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>

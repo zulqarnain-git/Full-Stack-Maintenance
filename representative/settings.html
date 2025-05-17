@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Settings - MaintSys Rep</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/img/logo-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar (Consistent with previous example) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request <span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li class="active"><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Settings <span id="repWelcomeName"></span></h1>
+                    <p class="subheader">Manage your account, servies and tasks.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+
+
+            <main class="page-content">
+                <div class="page-header">
+                    <p class="page-subtitle">Manage your account and preferences</p>
+                </div>
+
+                <section class="tabs-section">
+                    <div class="tab-navigation">
+                        <button class="tab-link active" data-tab="profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Profile
+                        </button>
+                        <button class="tab-link" data-tab="location">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Location
+                        </button>
+                        <button class="tab-link" data-tab="availability">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Availability
+                        </button>
+                        <button class="tab-link" data-tab="notifications">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            Notifications
+                        </button>
+                        <button class="tab-link" data-tab="security">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Security
+                        </button>
+                    </div>
+
+                    <!-- Profile Tab -->
+                    <div class="tab-content active" id="profileContent">
+                        <div class="card">
+                            <h3>Profile Information</h3>
+                            <p class="card-description">Update your account profile information.</p>
+                            <form id="profileForm" class="form-grid">
+                                <div class="form-group">
+                                    <label for="profileName">Full Name</label>
+                                    <input type="text" id="profileName" class="form-control" value="Representative User">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileEmail">Email Address</label>
+                                    <input type="email" id="profileEmail" class="form-control" value="representative@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profilePhone">Phone Number</label>
+                                    <input type="tel" id="profilePhone" class="form-control" value="+1 (555) 234-5678">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileSpecialization">Specialization</label>
+                                    <input type="text" id="profileSpecialization" class="form-control" value="Engine Repairs">
+                                </div>
+                                <div class="form-actions full-span">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3>Profile Picture</h3>
+                             <p class="card-description">Upload a profile picture or avatar.</p>
+                            <div class="profile-picture-section">
+                                <div class="avatar-placeholder">RU</div>
+                                <div>
+                                    <button type="button" class="btn btn-outline">Upload New Picture</button>
+                                    <p class="field-description">Recommended: Square image, at least 400x400px.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Skills & Certifications</h3>
+                            <p class="card-description">Add your technical skills and certifications.</p>
+                            <h4>Skills</h4>
+                            <div class="skills-tags" id="skillsTagsContainer">
+                                <span class="skill-tag">Engine Repair <button class="remove-tag" aria-label="Remove skill">×</button></span>
+                                <span class="skill-tag">Electrical Systems <button class="remove-tag" aria-label="Remove skill">×</button></span>
+                            </div>
+                            <div class="add-skill-form">
+                                <input type="text" id="newSkillInput" class="form-control" placeholder="Add new skill">
+                                <button type="button" id="addSkillBtn" class="btn btn-primary">Add</button>
+                            </div>
+                            <hr>
+                            <h4>Certifications</h4>
+                            <ul class="certifications-list" id="certificationsList">
+                                <li>
+                                    <div>
+                                        <p>ASE Master Technician</p>
+                                        <small>Expires: Dec 2026</small>
+                                    </div>
+                                    <button class="btn btn-outline btn-sm">View/Edit</button>
+                                </li>
+                            </ul>
+                             <button type="button" class="btn btn-outline mt-1">Add Certification</button>
+                        </div>
+                    </div>
+
+                    <!-- Location Tab -->
+                    <div class="tab-content" id="locationContent">
+                        <div class="card">
+                            <h3>Location Settings</h3>
+                            <p class="card-description">Configure your service area and location preferences.</p>
+                            <form id="locationForm" class="form-grid">
+                                <div class="form-group">
+                                    <label for="locationRegion">Primary Region</label>
+                                    <select id="locationRegion" class="form-control">
+                                        <option selected>North</option><option>South</option><option>East</option><option>West</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="locationTravelDistance">Max Travel Distance (km)</label>
+                                    <input type="number" id="locationTravelDistance" class="form-control" value="50">
+                                </div>
+                                <div class="form-group full-span">
+                                    <label>Preferred Work Zones</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" checked> Downtown</label>
+                                        <label><input type="checkbox" checked> Industrial District</label>
+                                        <label><input type="checkbox"> Suburbs</label>
+                                        <label><input type="checkbox"> Rural Areas</label>
+                                    </div>
+                                </div>
+                                <div class="form-group switch-group full-span">
+                                    <div>
+                                        <label for="locationWeekend" class="switch-label">Available for Weekend Work</label>
+                                        <p class="field-description">Set your availability for weekends.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="locationWeekend">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-actions full-span">
+                                    <button type="submit" class="btn btn-primary">Save Location Settings</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3>Current Location</h3>
+                            <p class="card-description">View your service area on the map.</p>
+                            <div class="map-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <p>Map view showing service area would appear here.</p>
+                            </div>
+                             <div class="form-actions space-between mt-1">
+                                <button class="btn btn-outline">Update Current Location</button>
+                                <button class="btn btn-outline">Enable GPS Tracking</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Availability Tab -->
+                    <div class="tab-content" id="availabilityContent">
+                        <div class="card">
+                            <h3>Weekly Availability</h3>
+                            <p class="card-description">Set your regular working hours.</p>
+                            <form id="availabilityForm">
+                                <div class="availability-schedule">
+                                    <!-- JS will populate this -->
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Schedule</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3>Time Off Requests</h3>
+                            <p class="card-description">Request vacation or time off.</p>
+                            <form id="timeOffForm" class="form-grid">
+                                <div class="form-group">
+                                    <label for="timeOffStartDate">Start Date</label>
+                                    <input type="date" id="timeOffStartDate" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="timeOffEndDate">End Date</label>
+                                    <input type="date" id="timeOffEndDate" class="form-control">
+                                </div>
+                                <div class="form-group full-span">
+                                    <label for="timeOffType">Type</label>
+                                    <select id="timeOffType" class="form-control">
+                                        <option>Vacation</option><option>Sick Leave</option><option>Personal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-span">
+                                    <label for="timeOffReason">Reason (Optional)</label>
+                                    <textarea id="timeOffReason" class="form-control" rows="3"></textarea>
+                                </div>
+                                <div class="form-actions full-span">
+                                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                                </div>
+                            </form>
+                            <hr>
+                            <h4>Upcoming Time Off</h4>
+                            <p id="upcomingTimeOff" class="text-muted">No upcoming time off scheduled.</p>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div class="tab-content" id="notificationsContent">
+                        <div class="card">
+                            <h3>Notification Preferences</h3>
+                            <p class="card-description">Configure how you want to receive notifications.</p>
+                            <form id="notificationsForm">
+                                <h4>Notification Channels</h4>
+                                <div class="form-group switch-group">
+                                    <div>
+                                        <label for="notifEmail" class="switch-label">Email Notifications</label>
+                                        <p class="field-description">Receive updates via email.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifEmail" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group switch-group">
+                                    <div>
+                                        <label for="notifPush" class="switch-label">Push Notifications</label>
+                                        <p class="field-description">Receive updates in the browser/app.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifPush" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group switch-group">
+                                    <div>
+                                        <label for="notifSms" class="switch-label">SMS Notifications</label>
+                                        <p class="field-description">Receive text messages for urgent updates.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifSms">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <hr>
+                                <h4>Notification Types</h4>
+                                <div class="form-group switch-group">
+                                    <div>
+                                        <label for="notifNewAssignments" class="switch-label">New Work Assignments</label>
+                                        <p class="field-description">When you're assigned new requests.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifNewAssignments" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group switch-group">
+                                    <div>
+                                        <label for="notifStatusChanges" class="switch-label">Request Status Changes</label>
+                                        <p class="field-description">When status of your requests changes.</p>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="notifStatusChanges" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="tab-content" id="securityContent">
+                        <div class="card">
+                            <h3>Change Password</h3>
+                            <p class="card-description">Update your account password.</p>
+                            <form id="passwordForm" class="form-grid single-col-grid">
+                                <div class="form-group">
+                                    <label for="currentPassword">Current Password</label>
+                                    <input type="password" id="currentPassword" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newPassword">New Password</label>
+                                    <input type="password" id="newPassword" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" class="form-control">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3>Mobile Application</h3>
+                            <p class="card-description">Access your account on mobile devices.</p>
+                            <div class="form-group switch-group">
+                                <div>
+                                    <label for="mobileAccess" class="switch-label">Mobile App Access</label>
+                                    <p class="field-description">Enable access to the mobile application.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="mobileAccess" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="form-actions space-between mt-1">
+                                <button class="btn btn-outline">Download Mobile App</button>
+                                <button class="btn btn-outline">Reset Mobile Access</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <div id="toastNotification" class="toast"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    // --- Reusable UI Logic (Sidebar, Profile Dropdown, Tabs) ---
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const mobileSidebarToggle = document.querySelector('.mobile-sidebar-toggle');
+    const userProfileButton = document.querySelector('.user-profile-button');
+    const dropdownMenu = document.querySelector('.user-profile-dropdown .dropdown-menu');
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const toastElement = document.getElementById('toastNotification');
+
+    sidebarToggle?.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+    mobileSidebarToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.addEventListener('click', (event) => {
+        if (sidebar?.classList.contains('open') && !sidebar.contains(event.target) && !mobileSidebarToggle?.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+        if (dropdownMenu?.classList.contains('show') && !userProfileButton?.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    userProfileButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu?.classList.toggle('show');
+    });
+    tabLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const tabId = link.dataset.tab;
+            tabLinks.forEach(l => l.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            link.classList.add('active');
+            document.getElementById(`${tabId}Content`)?.classList.add('active');
+        });
+    });
+
+    // --- Toast Notification Function ---
+    function showToast(message, type = 'info') { // type can be 'success', 'error', 'info'
+        if (!toastElement) return;
+        toastElement.textContent = message;
+        toastElement.className = 'toast show'; // Base classes
+        if (type === 'success') toastElement.classList.add('success');
+        else if (type === 'error') toastElement.classList.add('error');
+        
+        setTimeout(() => {
+            toastElement.classList.remove('show');
+        }, 3000);
+    }
+
+    // --- Settings Specific Logic ---
+
+    // Profile Form
+    const profileForm = document.getElementById('profileForm');
+    profileForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('profileName').value;
+        // ... get other values
+        console.log('Profile saved:', { name /*, ... */});
+        showToast('Profile information updated successfully.', 'success');
+    });
+
+    // Skills
+    const newSkillInput = document.getElementById('newSkillInput');
+    const addSkillBtn = document.getElementById('addSkillBtn');
+    const skillsTagsContainer = document.getElementById('skillsTagsContainer');
+
+    function addSkillTag(skillName) {
+        if (!skillName.trim()) return;
+        const tag = document.createElement('span');
+        tag.className = 'skill-tag';
+        tag.textContent = skillName + ' ';
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-tag';
+        removeBtn.innerHTML = '×';
+        removeBtn.setAttribute('aria-label', 'Remove skill');
+        removeBtn.onclick = () => tag.remove();
+        tag.appendChild(removeBtn);
+        skillsTagsContainer.appendChild(tag);
+    }
+
+    addSkillBtn?.addEventListener('click', () => {
+        addSkillTag(newSkillInput.value);
+        newSkillInput.value = '';
+    });
+    newSkillInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkillTag(newSkillInput.value);
+            newSkillInput.value = '';
+        }
+    });
+    // Add event listeners for existing remove buttons (if any loaded initially)
+    skillsTagsContainer?.querySelectorAll('.remove-tag').forEach(btn => {
+        btn.onclick = () => btn.parentElement.remove();
+    });
+
+
+    // Location Form
+    const locationForm = document.getElementById('locationForm');
+    locationForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Location settings saved.');
+        showToast('Location settings updated successfully.', 'success');
+    });
+
+    // Availability Schedule
+    const availabilityScheduleContainer = document.querySelector('.availability-schedule');
+    const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const initialAvailability = {
+        monday: {start: '09:00', end: '17:00', available: true},
+        tuesday: {start: '09:00', end: '17:00', available: true},
+        wednesday: {start: '09:00', end: '17:00', available: true},
+        thursday: {start: '09:00', end: '17:00', available: true},
+        friday: {start: '09:00', end: '17:00', available: true},
+        saturday: {start: '10:00', end: '15:00', available: false},
+        sunday: {start: '', end: '', available: false},
+    };
+
+    if (availabilityScheduleContainer) {
+        daysOfWeek.forEach(day => {
+            const dayData = initialAvailability[day];
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'availability-day';
+            dayDiv.innerHTML = `
+                <div class="day-name-switch">
+                    <label class="switch">
+                        <input type="checkbox" id="avail-${day}-check" ${dayData.available ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="avail-${day}-check" class="switch-label">${day}</label>
+                </div>
+                <input type="time" id="avail-${day}-start" class="form-control" value="${dayData.start}" ${!dayData.available ? 'disabled' : ''}>
+                <span>to</span>
+                <input type="time" id="avail-${day}-end" class="form-control" value="${dayData.end}" ${!dayData.available ? 'disabled' : ''}>
+            `;
+            availabilityScheduleContainer.appendChild(dayDiv);
+
+            const check = dayDiv.querySelector(`#avail-${day}-check`);
+            const startInput = dayDiv.querySelector(`#avail-${day}-start`);
+            const endInput = dayDiv.querySelector(`#avail-${day}-end`);
+            check.addEventListener('change', () => {
+                startInput.disabled = !check.checked;
+                endInput.disabled = !check.checked;
+                if(!check.checked){
+                    startInput.value = "";
+                    endInput.value = "";
+                } else {
+                    startInput.value = initialAvailability[day].start || "09:00"; // Default if was empty
+                    endInput.value = initialAvailability[day].end || "17:00";
+                }
+            });
+        });
+    }
+    const availabilityForm = document.getElementById('availabilityForm');
+    availabilityForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Logic to collect availability data
+        console.log('Availability schedule saved.');
+        showToast('Availability schedule updated.', 'success');
+    });
+
+    // Time Off Form
+    const timeOffForm = document.getElementById('timeOffForm');
+    timeOffForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Time off request submitted.');
+        showToast('Time off request submitted for approval.', 'success');
+        timeOffForm.reset();
+    });
+
+    // Notifications Form
+    const notificationsForm = document.getElementById('notificationsForm');
+    notificationsForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log('Notification preferences saved.');
+        showToast('Notification preferences updated.', 'success');
+    });
+
+    // Password Form
+    const passwordForm = document.getElementById('passwordForm');
+    passwordForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            showToast('New password and confirmation do not match.', 'error');
+            return;
+        }
+        if (!newPassword || newPassword.length < 6) {
+             showToast('New password must be at least 6 characters.', 'error');
+            return;
+        }
+        // Add logic to verify currentPassword if needed
+        console.log('Password change attempt.');
+        showToast('Password updated successfully.', 'success');
+        passwordForm.reset();
+    });
+    
+    // Set default active tab
+    document.querySelector('.tab-link[data-tab="profile"]')?.click();
+});
+    </script>
+</body>
+</html>

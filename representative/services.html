@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parts & Services Log - MaintSys Rep</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/img/logo-icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar (Consistent with previous examples) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request <span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li  class="active"><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+        
+            <main class="main-content">
+                <header class="content-header">
+                    <div class="header-title">
+                        <h1>Parts & Services Log<span id="repWelcomeName"></span></h1>
+                        <p class="subheader">Record of Parts Purchased and Services Used</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" placeholder="Search...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-count">3</span>
+                        </div>
+                         <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="page-header">
+                    <h2>Record of Parts Purchased and Services Used</h2>
+                    <button class="btn btn-primary" id="logNewPurchaseBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Log New Entry
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="table-filters">
+                        <input type="text" id="filterSearch" placeholder="Search by Part, Supplier, Request ID..." class="form-control">
+                        <input type="month" id="filterMonth" class="form-control" title="Filter by month">
+                        <select id="filterRequestId" class="form-control">
+                            <option value="">All Request IDs</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <button class="btn btn-secondary" id="applyFiltersBtn">Apply Filters</button>
+                        <button class="btn btn-outline" id="resetFiltersBtn">Reset</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="partsLogTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Request ID</th>
+                                    <th>Part/Service Name</th>
+                                    <th>Supplier</th>
+                                    <th>Qty</th>
+                                    <th>Unit Cost</th>
+                                    <th>Total Cost</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rows will be injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="paginationControls">
+                        <!-- Pagination buttons will be injected by JS -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Logging Part Purchase/Service -->
+    <div id="logPurchaseModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="logPurchaseModalTitle">Log New Part/Service</h2>
+                <button class="close-button" data-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="logPurchaseForm">
+                    <input type="hidden" id="logEntryId" name="id">
+                    <div class="form-grid">
+                        <div class="form-group full-span">
+                            <label for="logRequestIdModal">Associated Request ID</label>
+                            <select id="logRequestIdModal" name="request_id" class="form-control" required>
+                                <option value="">-- Select Request --</option>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="logPartName">Part/Service Name</label>
+                            <input type="text" id="logPartName" name="part_name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="logSupplier">Supplier/Vendor</label>
+                            <input type="text" id="logSupplier" name="supplier" class="form-control">
+                        </div>
+                         <div class="form-group">
+                            <label for="logPurchaseDate">Date of Purchase/Service</label>
+                            <input type="date" id="logPurchaseDate" name="purchase_date" class="form-control" required>
+                        </div>
+                        <div class="form-group"> <!-- Placeholder for correct grid placement -->
+                        </div>
+                        <div class="form-group">
+                            <label for="logQuantity">Quantity</label>
+                            <input type="number" id="logQuantity" name="quantity" class="form-control" value="1" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="logUnitCost">Unit Cost ($)</label>
+                            <input type="number" id="logUnitCost" name="unit_cost" class="form-control" step="0.01" min="0" required>
+                        </div>
+                         <div class="form-group">
+                            <label for="logTotalCost">Total Cost ($)</label>
+                            <input type="text" id="logTotalCost" name="total_cost" class="form-control" readonly>
+                        </div>
+                        <div class="form-group full-span">
+                            <label for="logNotes">Notes (Optional)</label>
+                            <textarea id="logNotes" name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="logPurchaseForm">Save Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="toast"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    // --- Reusable UI Logic (Sidebar, Profile Dropdown) ---
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const mobileSidebarToggle = document.querySelector('.mobile-sidebar-toggle');
+    const userProfileButton = document.querySelector('.user-profile-button');
+    const dropdownMenu = document.querySelector('.user-profile-dropdown .dropdown-menu');
+    const toastElement = document.getElementById('toastNotification');
+
+    sidebarToggle?.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+    mobileSidebarToggle?.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.addEventListener('click', (event) => {
+        if (sidebar?.classList.contains('open') && !sidebar.contains(event.target) && !mobileSidebarToggle?.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+        if (dropdownMenu?.classList.contains('show') && !userProfileButton?.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    userProfileButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu?.classList.toggle('show');
+    });
+
+    // --- Toast Notification Function ---
+    function showToast(message, type = 'info') {
+        if (!toastElement) return;
+        toastElement.textContent = message;
+        toastElement.className = 'toast show';
+        if (type === 'success') toastElement.classList.add('success');
+        else if (type === 'error') toastElement.classList.add('error');
+        setTimeout(() => toastElement.classList.remove('show'), 3000);
+    }
+
+    // --- Parts & Services Log Specific Logic ---
+    const logNewPurchaseBtn = document.getElementById('logNewPurchaseBtn');
+    const logPurchaseModal = document.getElementById('logPurchaseModal');
+    const logPurchaseForm = document.getElementById('logPurchaseForm');
+    const logPurchaseModalTitle = document.getElementById('logPurchaseModalTitle');
+    const partsLogTableBody = document.getElementById('partsLogTable')?.querySelector('tbody');
+    const paginationControls = document.getElementById('paginationControls');
+
+    // Modal Inputs
+    const logEntryIdInput = document.getElementById('logEntryId');
+    const logRequestIdModalSelect = document.getElementById('logRequestIdModal');
+    const logPartNameInput = document.getElementById('logPartName');
+    const logSupplierInput = document.getElementById('logSupplier');
+    const logPurchaseDateInput = document.getElementById('logPurchaseDate');
+    const logQuantityInput = document.getElementById('logQuantity');
+    const logUnitCostInput = document.getElementById('logUnitCost');
+    const logTotalCostInput = document.getElementById('logTotalCost');
+    const logNotesInput = document.getElementById('logNotes');
+
+    // Filters
+    const filterSearchInput = document.getElementById('filterSearch');
+    const filterMonthInput = document.getElementById('filterMonth');
+    const filterRequestIdSelect = document.getElementById('filterRequestId');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+    let mockLogData = [
+        { id: 'l1', date: '2023-10-26', requestId: 'REQ-085', partName: 'Engine Oil (Synthetic 5W-30)', supplier: 'Local Auto Parts', quantity: 2, unitCost: 35.00, notes: 'For routine maintenance.' },
+        { id: 'l2', date: '2023-10-25', requestId: 'REQ-082', partName: 'Brake Pad Set (Front)', supplier: 'Central Spares', quantity: 1, unitCost: 85.00, notes: '' },
+        { id: 'l3', date: '2023-10-24', requestId: 'REQ-085', partName: 'Air Filter', supplier: 'Local Auto Parts', quantity: 1, unitCost: 15.50, notes: 'Replaced during service.' },
+        { id: 'l4', date: '2023-09-15', requestId: 'REQ-070', partName: 'Wiper Blades (Pair)', supplier: 'Speedy Parts', quantity: 1, unitCost: 22.00, notes: '' },
+        { id: 'l5', date: '2023-09-10', requestId: 'REQ-068', partName: 'Headlight Bulb H7', supplier: 'Bright Lights Inc.', quantity: 2, unitCost: 12.75, notes: 'Both replaced.' },
+    ];
+    
+    let mockRequestsData = [ // For populating dropdowns
+        { id: 'REQ-085', client: 'Client Alpha', vehicle: 'Truck T-01' },
+        { id: 'REQ-082', client: 'Client Beta', vehicle: 'Van V-03' },
+        { id: 'REQ-070', client: 'Client Gamma', vehicle: 'Sedan S-05'},
+        { id: 'REQ-068', client: 'Client Delta', vehicle: 'SUV X-02'}
+    ];
+
+    let filteredData = [...mockLogData];
+    let currentPage = 1;
+    const rowsPerPage = 5;
+
+    function populateRequestDropdowns() {
+        const selects = [logRequestIdModalSelect, filterRequestIdSelect];
+        selects.forEach(select => {
+            if (!select) return;
+            // Clear existing options except the first one
+            while (select.options.length > 1) select.remove(1);
+            
+            mockRequestsData.forEach(req => {
+                const option = document.createElement('option');
+                option.value = req.id;
+                option.textContent = `${req.id} (${req.client} - ${req.vehicle})`;
+                select.appendChild(option);
+            });
+        });
+    }
+
+    function calculateTotalCost() {
+        const quantity = parseFloat(logQuantityInput.value) || 0;
+        const unitCost = parseFloat(logUnitCostInput.value) || 0;
+        logTotalCostInput.value = (quantity * unitCost).toFixed(2);
+    }
+    logQuantityInput?.addEventListener('input', calculateTotalCost);
+    logUnitCostInput?.addEventListener('input', calculateTotalCost);
+
+
+    function renderTablePage() {
+        if (!partsLogTableBody) return;
+        partsLogTableBody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedItems = filteredData.slice(start, end);
+
+        if (paginatedItems.length === 0) {
+            const row = partsLogTableBody.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 8;
+            cell.textContent = 'No log entries found.';
+            cell.style.textAlign = 'center';
+        } else {
+            paginatedItems.forEach(item => {
+                const row = partsLogTableBody.insertRow();
+                const totalCost = (item.quantity * item.unitCost).toFixed(2);
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td><a href="#" title="View details for ${item.requestId}">${item.requestId}</a></td>
+                    <td>${item.partName}</td>
+                    <td>${item.supplier}</td>
+                    <td>${item.quantity}</td>
+                    <td>$${item.unitCost.toFixed(2)}</td>
+                    <td>$${totalCost}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon edit-log-entry" data-id="${item.id}" aria-label="Edit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                    </td>
+                `;
+                row.querySelector('.edit-log-entry').addEventListener('click', () => openModalForEdit(item.id));
+            });
+        }
+        setupPagination();
+    }
+
+    function setupPagination() {
+        if (!paginationControls) return;
+        paginationControls.innerHTML = '';
+        const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+
+        if (pageCount <= 1) return;
+
+        // Previous Button
+        const prevButton = document.createElement('button');
+        prevButton.innerHTML = '« Prev';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTablePage();
+            }
+        });
+        paginationControls.appendChild(prevButton);
+
+        // Page Number Buttons (simplified for brevity, can be extended)
+        for (let i = 1; i <= pageCount; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                renderTablePage();
+            });
+            paginationControls.appendChild(pageButton);
+        }
+        
+        // Next Button
+        const nextButton = document.createElement('button');
+        nextButton.innerHTML = 'Next »';
+        nextButton.disabled = currentPage === pageCount;
+        nextButton.addEventListener('click', () => {
+            if (currentPage < pageCount) {
+                currentPage++;
+                renderTablePage();
+            }
+        });
+        paginationControls.appendChild(nextButton);
+    }
+
+    function openModalForNew() {
+        logPurchaseModalTitle.textContent = 'Log New Part/Service';
+        logPurchaseForm.reset();
+        logEntryIdInput.value = ''; // Ensure no ID for new entry
+        logTotalCostInput.value = '0.00';
+        // Set default date to today
+        logPurchaseDateInput.value = new Date().toISOString().split('T')[0];
+        logPurchaseModal.classList.add('show');
+    }
+
+    function openModalForEdit(id) {
+        const item = mockLogData.find(entry => entry.id === id);
+        if (item) {
+            logPurchaseModalTitle.textContent = 'Edit Log Entry';
+            logEntryIdInput.value = item.id;
+            logRequestIdModalSelect.value = item.requestId;
+            logPartNameInput.value = item.partName;
+            logSupplierInput.value = item.supplier;
+            logPurchaseDateInput.value = item.date;
+            logQuantityInput.value = item.quantity;
+            logUnitCostInput.value = item.unitCost.toFixed(2);
+            calculateTotalCost(); // Recalculate and display
+            logNotesInput.value = item.notes || '';
+            logPurchaseModal.classList.add('show');
+        }
+    }
+
+    function closeModal() {
+        logPurchaseModal.classList.remove('show');
+        logPurchaseForm.reset();
+    }
+
+    logNewPurchaseBtn?.addEventListener('click', openModalForNew);
+    logPurchaseModal?.querySelectorAll('[data-dismiss="modal"]').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
+    // Close modal if backdrop is clicked
+    logPurchaseModal?.addEventListener('click', (event) => {
+        if (event.target === logPurchaseModal) {
+            closeModal();
+        }
+    });
+
+
+    logPurchaseForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = {
+            id: logEntryIdInput.value,
+            requestId: logRequestIdModalSelect.value,
+            partName: logPartNameInput.value,
+            supplier: logSupplierInput.value,
+            date: logPurchaseDateInput.value,
+            quantity: parseFloat(logQuantityInput.value),
+            unitCost: parseFloat(logUnitCostInput.value),
+            notes: logNotesInput.value
+        };
+
+        if (!formData.requestId || !formData.partName || !formData.date || isNaN(formData.quantity) || isNaN(formData.unitCost)) {
+            showToast('Please fill all required fields correctly.', 'error');
+            return;
+        }
+
+        if (formData.id) { // Editing existing
+            const index = mockLogData.findIndex(item => item.id === formData.id);
+            if (index > -1) {
+                mockLogData[index] = { ...mockLogData[index], ...formData };
+            }
+        } else { // Adding new
+            formData.id = 'l' + (mockLogData.length + 1) + Date.now(); // Simple unique ID
+            mockLogData.push(formData);
+        }
+        applyAllFilters(); // This will re-filter and re-render
+        closeModal();
+        showToast(`Log entry ${formData.id ? 'updated' : 'saved'} successfully.`, 'success');
+    });
+
+    function applyAllFilters() {
+        const searchTerm = filterSearchInput.value.toLowerCase();
+        const selectedMonth = filterMonthInput.value; // YYYY-MM
+        const selectedRequestId = filterRequestIdSelect.value;
+
+        filteredData = mockLogData.filter(item => {
+            const itemMonth = item.date.substring(0, 7); // YYYY-MM from item.date
+            
+            const matchesSearch = searchTerm ? 
+                item.partName.toLowerCase().includes(searchTerm) ||
+                item.supplier.toLowerCase().includes(searchTerm) ||
+                item.requestId.toLowerCase().includes(searchTerm) ||
+                (item.notes && item.notes.toLowerCase().includes(searchTerm))
+                : true;
+            
+            const matchesMonth = selectedMonth ? itemMonth === selectedMonth : true;
+            const matchesRequestId = selectedRequestId ? item.requestId === selectedRequestId : true;
+
+            return matchesSearch && matchesMonth && matchesRequestId;
+        });
+        currentPage = 1; // Reset to first page after filtering
+        renderTablePage();
+    }
+
+    applyFiltersBtn?.addEventListener('click', applyAllFilters);
+    resetFiltersBtn?.addEventListener('click', () => {
+        filterSearchInput.value = '';
+        filterMonthInput.value = '';
+        filterRequestIdSelect.value = '';
+        applyAllFilters();
+    });
+    // Optional: Apply filters on input change for a more live feel
+    // filterSearchInput?.addEventListener('input', applyAllFilters);
+    // filterMonthInput?.addEventListener('change', applyAllFilters);
+    // filterRequestIdSelect?.addEventListener('change', applyAllFilters);
+
+
+    // --- Initial Page Load ---
+    function initializePage() {
+        populateRequestDropdowns();
+        applyAllFilters(); // Initial render with all data
+    }
+
+    initializePage();
+});
+    </script>
+</body>
+</html>

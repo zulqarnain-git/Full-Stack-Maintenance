@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule | MaintSys Rep</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Representative Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request <span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li  class="active"><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <div class="page-title-group">
+                    <h1>My Schedule</h1>
+                    <p class="subheader">Manage your tasks and appointments for the week.</p>
+                </div>
+                 <div class="header-actions rep-header-actions">
+                     <button class="btn btn-sm btn-outline" id="filterScheduleBtn"><i class="fas fa-filter"></i> Filter</button>
+                     <button class="btn btn-sm btn-outline" id="exportScheduleBtn"><i class="fas fa-download"></i> Export</button>
+                     <button class="btn btn-sm btn-primary" id="addNewEventGlobalBtn"><i class="fas fa-plus"></i> Add Event</button>
+                </div>
+            </header>
+
+            <div class="schedule-page-layout">
+                <div class="main-schedule-area card"> 
+                    <div class="card-header weekly-schedule-header">
+                        <h3>Weekly Schedule</h3>
+                        <div class="week-navigation">
+                            <button class="btn btn-icon btn-sm" id="prevWeekBtn" title="Previous Week"><i class="fas fa-chevron-left"></i></button>
+                            <span id="currentWeekDisplay" class="current-week-text">May 08 - May 14, 2025</span>
+                            <button class="btn btn-icon btn-sm" id="nextWeekBtn" title="Next Week"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-view">
+                            <div class="calendar-header-days-target">
+                                <!-- Day names populated by JS -->
+                            </div>
+                            <div class="calendar-grid-target" id="calendarGridTarget">
+                                <!-- Calendar day cells populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-schedule-info">
+                    <div class="card upcoming-events-card-target">
+                        <div class="card-header"><h4><i class="far fa-calendar-alt"></i> Upcoming Events</h4></div>
+                        <div class="card-body">
+                            <ul class="upcoming-events-list-target" id="upcomingEventsListTarget">
+                                <li class="no-events">No upcoming events.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card monthly-overview-card-target">
+                        <div class="card-header">
+                            <h4><i class="fas fa-chart-pie"></i> Monthly Overview (<span id="currentMonthForOverview">May</span>)</h4>
+                            <button class="btn btn-icon btn-sm" title="Filter Overview"><i class="fas fa-ellipsis-v"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="monthly-stats-target">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Events</span>
+                                    <span class="stat-value" id="monthlyTotalEventsTarget">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Completed</span>
+                                    <span class="stat-value" id="monthlyCompletedEventsTarget">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Completion</span>
+                                    <span class="stat-value" id="monthlyCompletionRateTarget">0%</span>
+                                </div>
+                            </div>
+                            <hr class="my-3">
+                            <p class="text-sm font-medium mb-2">Task Types</p>
+                            <ul class="event-type-summary-target" id="monthlyEventTypeSummaryTarget">
+                                <!-- Populated by JS -->
+                            </ul>
+                             <button class="btn btn-outline btn-block mt-3" id="exportMonthlyReportBtn"><i class="fas fa-file-export"></i> Export Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <h4 id="eventModalTitle">Add New Event</h4>
+                <button class="close-btn" data-target-modal="eventModal">×</button>
+            </div>
+            <form id="eventForm">
+                <div class="modal-body">
+                    <input type="hidden" id="eventId">
+                    <div class="form-group">
+                        <label for="eventTitle">Title <span class="required-asterisk">*</span></label>
+                        <input type="text" id="eventTitle" class="form-control" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eventDate">Date <span class="required-asterisk">*</span></label>
+                            <input type="text" id="eventDate" class="form-control datepicker" placeholder="Select date..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventTime">Time <span class="required-asterisk">*</span></label>
+                            <input type="time" id="eventTime" class="form-control" value="09:00" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventClient">Client / Contact</label>
+                        <input type="text" id="eventClient" class="form-control" placeholder="e.g., ABC Corp or Internal">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventLocation">Location</label>
+                        <input type="text" id="eventLocation" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventRequestId">Related Request ID (Optional)</label>
+                        <input type="text" id="eventRequestId" class="form-control" placeholder="e.g., REQ-2025-044">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventType">Event Type <span class="required-asterisk">*</span></label>
+                        <select id="eventType" class="form-control" required>
+                            <option value="delivery">Delivery</option>
+                            <option value="installation">Installation</option>
+                            <option value="inspection">Inspection</option>
+                            <option value="parts-pickup">Parts Pickup</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventNotes">Notes (Optional)</label>
+                        <textarea id="eventNotes" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                     <button type="button" class="btn btn-danger" id="deleteEventBtn" style="margin-right: auto; display: none;"><i class="fas fa-trash-alt"></i> Delete</button>
+                     <button type="button" class="btn btn-secondary" data-target-modal="eventModal">Cancel</button>
+                     <button type="submit" class="btn btn-primary" id="saveEventBtn">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+    let repProfileData = { name: "John Doe", avatarUrl: "https://via.placeholder.com/40?text=JD" };
+    let currentWeekStartDate = getStartOfWeek(new Date('2025-05-08')); // Default: Mon May 5, 2025
+    
+    let scheduleData = [ 
+        { date: '2025-05-08', events: [
+            { id: 'EVT-001', title: 'Parts Pickup', time: '09:00', client: 'ABC Corporation', location: 'Supplier Warehouse', type: 'parts-pickup', completed: false, notes: '' },
+            { id: 'EVT-002', title: 'Deliver and Install Parts', time: '11:30', client: 'XYZ Industries', location: 'Site B, Northern Region', type: 'installation', completed: false, notes: '' },
+            { id: 'EVT-003', title: 'Installation Inspection', time: '14:00', client: 'Global Logistics', location: 'Distribution Center', type: 'inspection', completed: false, notes: '' }]
+        },
+        { date: '2025-05-09', events: [
+            { id: 'EVT-004', title: 'Weekly Team Meeting', time: '09:30', client: 'Internal', location: 'Regional Office', type: 'meeting', completed: false, notes: '' },
+            { id: 'EVT-005', title: 'Parts Delivery', time: '11:00', client: 'Tech Solutions Inc', location: 'Regional HQ', type: 'delivery', completed: false, notes: '' }, 
+            { id: 'EVT-006', title: 'Installation Check', time: '15:30', client: 'ABC Corporation', location: 'Main Office', type: 'inspection', completed: false, notes: '' }]
+        },
+        { date: '2025-05-10', events: [
+            { id: 'EVT-007', title: 'Parts Pickup', time: '10:00', client: 'First National Bank', location: 'Supplier Warehouse', type: 'parts-pickup', completed: false, notes: '' }]
+        },
+        { date: '2025-05-11', events: [] }, // Sunday
+        { date: '2025-05-12', events: [
+            { id: 'EVT-008', title: 'Installation', time: '09:30', client: 'First National Bank', location: 'Branch Office', type: 'installation', completed: false, notes: '' },
+            { id: 'EVT-009', title: 'Monthly Review', time: '14:00', client: 'Internal', location: 'Regional Office', type: 'meeting', completed: false, notes: '' }]
+        },
+        { date: '2025-05-05', events: [{ id: 'EVT-MON', title: 'Prep Work', time: '10:00', client: 'Internal', location: 'Workshop', type: 'other', completed: false, notes:''}]},
+        { date: '2025-05-06', events: []},
+        { date: '2025-05-07', events: [{ id: 'EVT-WED', title: 'Client Call', time: '16:00', client: 'New Client Co.', location: 'Remote', type: 'meeting', completed: false, notes:''}]},
+        { date: '2025-05-13', events: [{ id: 'EVT-010', title: 'Maintenance Inspection', time: '11:00', client: 'Global Logistics', location: 'Distribution Center', type: 'inspection', completed: false, notes: '' }]},
+        { date: '2025-05-14', events: [{ id: 'EVT-011', title: 'Parts Delivery', time: '10:30', client: 'Tech Solutions Inc', location: 'Regional HQ', type: 'delivery', completed: false, notes: '' }]}
+    ];
+
+    const $eventModal = $('#eventModal');
+    const $eventForm = $('#eventForm');
+    const dayFullNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayShortNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+
+    flatpickr(".datepicker", { dateFormat: "Y-m-d", altInput: true, altFormat: "M j, Y" });
+
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+    function loadRepProfile() {
+        $('#repSidebarAvatar').attr('src', repProfileData.avatarUrl);
+        $('#repSidebarName').text(repProfileData.name);
+    }
+    loadRepProfile();
+
+    function getStartOfWeek(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const startDate = new Date(d.setDate(diff));
+        startDate.setHours(0,0,0,0); 
+        return startDate;
+    }
+
+    function formatDateDisplay(date) { // For display like "May 8"
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    function formatDateISO(date) { // For internal use YYYY-MM-DD
+        return date.toISOString().split('T')[0];
+    }
+
+    function getEventTypeClass(type) {
+        return `event-type-${type}-target`; 
+    }
+
+    function renderCalendar() {
+        const $calendarGrid = $('#calendarGridTarget');
+        const $calendarHeaderDays = $('.calendar-header-days-target');
+        $calendarGrid.empty();
+        $calendarHeaderDays.empty();
+
+        const weekDates = [];
+        for (let i = 0; i < 7; i++) {
+            const dayDate = new Date(currentWeekStartDate);
+            dayDate.setDate(currentWeekStartDate.getDate() + i);
+            weekDates.push(dayDate);
+            // Use short names for header like target design, full names if space allows (handled by media query)
+            $calendarHeaderDays.append(`<div>${dayShortNames[dayDate.getDay()]}</div>`); 
+        }
+        $('#currentWeekDisplay').text(`${formatDateDisplay(weekDates[0])} - ${formatDateDisplay(weekDates[6])}`);
+
+        const todayISO = formatDateISO(new Date());
+
+        weekDates.forEach(date => {
+            const dateISO = formatDateISO(date);
+            const dayData = scheduleData.find(d => d.date === dateISO);
+            const events = dayData ? dayData.events.sort((a,b) => a.time.localeCompare(b.time)) : [];
+            
+            let eventsHtml = '';
+            if (events.length > 0) {
+                eventsHtml = events.map(event => {
+                    const typeClass = getEventTypeClass(event.type);
+                    const completedClass = event.completed ? 'completed-target' : '';
+                    const completeButtonText = event.completed ? '<i class="fas fa-check-circle"></i> Completed' : '<i class="far fa-circle"></i> Complete';
+                    
+                    return `
+                        <div class="day-event-item-target ${typeClass} ${completedClass}" data-event-id="${event.id}" data-date="${dateISO}">
+                            <span class="event-time-title">${event.time} - ${event.title}</span>
+                            ${event.client ? `<span class="event-client">${event.client}</span>` : ''}
+                            ${event.location ? `<span class="event-location"><i class="fas fa-map-marker-alt fa-xs"></i> ${event.location}</span>` : ''}
+                            <div class="event-actions">
+                                <button class="btn btn-xs complete-btn" data-event-id="${event.id}" data-date="${dateISO}">${completeButtonText}</button>
+                                <button class="btn btn-xs event-edit-btn" data-event-id="${event.id}" data-date="${dateISO}"><i class="fas fa-pencil-alt"></i></button>
+                            </div>
+                        </div>`;
+                }).join('');
+            } else {
+                eventsHtml = '<p class="no-events-for-day-target">No events</p>';
+            }
+
+            $calendarGrid.append(`
+                <div class="calendar-day-cell-target ${dateISO === todayISO ? 'today-target' : ''}" data-date="${dateISO}">
+                    <div class="day-header-target">
+                        <span class="day-name-num">
+                            <span class="day-name">${dayShortNames[date.getDay()]}</span> <span class="day-num">${date.getDate()}</span>
+                        </span>
+                        <button class="btn btn-icon btn-xs quick-add-event-day-btn" data-date="${dateISO}" title="Add event"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div class="day-events-list-target">${eventsHtml}</div>
+                </div>
+            `);
+        });
+        updateUpcomingEvents();
+        updateMonthlyOverview();
+        updateSidebarBadge();
+    }
+    
+    function updateUpcomingEvents() {
+        const $list = $('#upcomingEventsListTarget');
+        $list.empty();
+        const todayStart = new Date();
+        todayStart.setHours(0,0,0,0);
+
+        const upcoming = scheduleData
+            .flatMap(day => day.events.map(event => ({ ...event, dateObj: new Date(day.date), dateStr: day.date })))
+            .filter(event => event.dateObj >= todayStart && !event.completed)
+            .sort((a, b) => {
+                if (a.dateObj.getTime() !== b.dateObj.getTime()) return a.dateObj - b.dateObj;
+                return a.time.localeCompare(b.time);
+            })
+            .slice(0, 5); // Show top 5
+
+        if (upcoming.length === 0) {
+            $list.append('<li class="no-events"><i class="far fa-calendar-check fa-2x"></i>No upcoming events.</li>');
+        } else {
+            upcoming.forEach(event => {
+                $list.append(`
+                    <li>
+                        <div class="event-date-time">${formatDateDisplay(event.dateObj)} @ ${event.time}</div>
+                        <div class="event-title">${event.title}</div>
+                        ${event.client ? `<div class="event-client-loc">${event.client} ${event.location ? ' - ' + event.location : ''}</div>` : ''}
+                    </li>`);
+            });
+        }
+    }
+
+    function updateMonthlyOverview() {
+        const currentViewDate = new Date(currentWeekStartDate); // Use the current week's start to determine the month
+        const currentMonth = currentViewDate.getMonth();
+        const currentYear = currentViewDate.getFullYear();
+        $('#currentMonthForOverview').text(new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long' }));
+        
+        const monthEvents = scheduleData
+            .filter(day => {
+                const eventDate = new Date(day.date);
+                return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
+            })
+            .flatMap(day => day.events);
+
+        const total = monthEvents.length;
+        const completed = monthEvents.filter(e => e.completed).length;
+        
+        $('#monthlyTotalEventsTarget').text(total);
+        $('#monthlyCompletedEventsTarget').text(completed);
+        $('#monthlyCompletionRateTarget').text(total > 0 ? ((completed / total) * 100).toFixed(0) + '%' : '0%');
+
+        const typeCounts = monthEvents.reduce((acc, event) => {
+            acc[event.type] = (acc[event.type] || 0) + 1;
+            return acc;
+        }, {});
+
+        const $summaryList = $('#monthlyEventTypeSummaryTarget');
+        $summaryList.empty();
+        const eventTypeColorMap = { 
+            'delivery': 'var(--event-color-dot-delivery)', 
+            'installation': 'var(--event-color-dot-installation)', 
+            'inspection': 'var(--event-color-dot-inspection)',
+            'parts-pickup': 'var(--event-color-dot-parts-pickup)', 
+            'meeting': 'var(--event-color-dot-meeting)', 
+            'other': 'var(--event-color-dot-other)'
+        };
+        for (const type in typeCounts) {
+            const typeLabel = type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            $summaryList.append(`<li><div class="type-name-dot"><span class="type-dot" style="background-color:${eventTypeColorMap[type] || '#adb5bd'}"></span> ${typeLabel}</div> <span class="type-count">${typeCounts[type]}</span></li>`);
+        }
+    }
+    
+    function updateSidebarBadge() {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const upcomingCount = scheduleData
+           .flatMap(day => day.events.map(event => ({ ...event, dateObj: new Date(day.date) })))
+           .filter(event => event.dateObj >= today && !event.completed).length;
+        $('#upcomingEventsBadge').text(upcomingCount > 0 ? upcomingCount : '').toggle(upcomingCount > 0);
+    }
+
+    $('#prevWeekBtn').on('click', function() {
+        currentWeekStartDate.setDate(currentWeekStartDate.getDate() - 7);
+        renderCalendar();
+    });
+    $('#nextWeekBtn').on('click', function() {
+        currentWeekStartDate.setDate(currentWeekStartDate.getDate() + 7);
+        renderCalendar();
+    });
+
+    function openEventModal(eventData = null, dateForNewEvent = null) {
+        $eventForm[0].reset();
+        const datePickerInstance = flatpickr("#eventDate", {defaultDate: null, dateFormat: "Y-m-d", altInput: true, altFormat: "M j, Y"});
+        
+        if (eventData) {
+            $('#eventModalTitle').text('Edit Event');
+            $('#eventId').val(eventData.id);
+            $('#eventTitle').val(eventData.title);
+            datePickerInstance.setDate(eventData.date, true); // eventData.date is already YYYY-MM-DD
+            $('#eventTime').val(eventData.time);
+            $('#eventClient').val(eventData.client);
+            $('#eventLocation').val(eventData.location);
+            $('#eventRequestId').val(eventData.requestId || '');
+            $('#eventType').val(eventData.type);
+            $('#eventNotes').val(eventData.notes || '');
+            $('#deleteEventBtn').show().data('event-id', eventData.id).data('date', eventData.date);
+        } else {
+            $('#eventModalTitle').text('Add New Event');
+            $('#eventId').val('');
+            const defaultDate = dateForNewEvent ? new Date(dateForNewEvent + 'T00:00:00') : new Date(); // Ensure correct timezone interpretation
+            datePickerInstance.setDate(defaultDate, true); 
+            $('#eventTime').val('09:00'); 
+            $('#deleteEventBtn').hide();
+        }
+        $eventModal.addClass('show');
+    }
+
+    $('#addNewEventGlobalBtn').on('click', () => openEventModal(null, new Date()));
+    $('#calendarGridTarget').on('click', '.quick-add-event-day-btn', function() {
+        openEventModal(null, $(this).data('date'));
+    });
+    $('#calendarGridTarget').on('click', '.event-edit-btn', function(e) {
+        e.stopPropagation(); 
+        const eventId = $(this).closest('.day-event-item-target').data('event-id');
+        const eventDate = $(this).closest('.day-event-item-target').data('date');
+        const dayData = scheduleData.find(d => d.date === eventDate);
+        if (dayData) {
+            const event = dayData.events.find(e => e.id === eventId);
+            if (event) openEventModal({...event, date: eventDate});
+        }
+    });
+     $('#calendarGridTarget').on('click', '.day-event-item-target', function(e) {
+        if ($(e.target).closest('.event-actions').length) return;
+        const eventId = $(this).data('event-id');
+        const eventDate = $(this).data('date');
+        const dayData = scheduleData.find(d => d.date === eventDate);
+        if (dayData) {
+            const event = dayData.events.find(e => e.id === eventId);
+            if (event) openEventModal({...event, date: eventDate});
+        }
+    });
+
+    $eventForm.on('submit', function(e) {
+        e.preventDefault();
+        const eventId = $('#eventId').val();
+        const eventDateStr = $('#eventDate').val(); 
+        
+        const eventData = {
+            id: eventId || `EVT-${Date.now()}`,
+            title: $('#eventTitle').val(),
+            date: eventDateStr,
+            time: $('#eventTime').val(),
+            client: $('#eventClient').val(),
+            location: $('#eventLocation').val(),
+            requestId: $('#eventRequestId').val() || undefined,
+            type: $('#eventType').val(),
+            notes: $('#eventNotes').val(),
+            completed: eventId ? (scheduleData.flatMap(d => d.events).find(ev => ev.id === eventId)?.completed || false) : false,
+        };
+
+        if (!eventData.title || !eventData.date || !eventData.time || !eventData.type) {
+            showToast('Title, Date, Time, and Type are required.', 'error'); return;
+        }
+
+        let dayObj = scheduleData.find(d => d.date === eventData.date);
+
+        if (eventId) { 
+            let oldEventDayObject = null;
+            let oldEventIndex = -1;
+            
+            scheduleData.forEach(day => {
+                const eIdx = day.events.findIndex(e => e.id === eventId);
+                if (eIdx !== -1) {
+                    oldEventDayObject = day;
+                    oldEventIndex = eIdx;
+                }
+            });
+
+            if (oldEventDayObject && oldEventIndex !== -1) {
+                 if (oldEventDayObject.date !== eventData.date) { 
+                    oldEventDayObject.events.splice(oldEventIndex, 1);
+                 } else { 
+                     oldEventDayObject.events[oldEventIndex] = eventData;
+                     dayObj = oldEventDayObject; 
+                 }
+            }
+        }
+        
+        if (!dayObj) { 
+            dayObj = { date: eventData.date, events: [] };
+            scheduleData.push(dayObj);
+        }
+        
+        if (!eventId || (eventId && dayObj.events.findIndex(e => e.id === eventData.id) === -1) ) {
+            dayObj.events.push(eventData);
+        }
+        
+        scheduleData.sort((a, b) => a.date.localeCompare(b.date));
+        scheduleData.forEach(day => day.events.sort((a, b) => a.time.localeCompare(b.time)));
+        
+        renderCalendar();
+        $eventModal.removeClass('show');
+        showToast(`Event ${eventId ? 'updated' : 'added'} successfully!`, 'success');
+    });
+    
+    $('#deleteEventBtn').on('click', function() {
+        const eventId = $(this).data('event-id');
+        const eventDate = $(this).data('date'); 
+
+        Swal.fire({
+            title: 'Delete Event?',
+            text: "Are you sure you want to delete this event?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const dayIndex = scheduleData.findIndex(d => d.date === eventDate);
+                if (dayIndex !== -1) {
+                    scheduleData[dayIndex].events = scheduleData[dayIndex].events.filter(e => e.id !== eventId);
+                }
+                renderCalendar();
+                $eventModal.removeClass('show');
+                showToast('Event deleted.', 'success');
+            }
+        });
+    });
+    
+    $('#calendarGridTarget').on('click', '.complete-btn', function(e) {
+        e.stopPropagation(); 
+        const eventId = $(this).closest('.day-event-item-target').data('event-id');
+        const eventDate = $(this).closest('.day-event-item-target').data('date');
+        const dayData = scheduleData.find(d => d.date === eventDate);
+        if (dayData) {
+            const event = dayData.events.find(e => e.id === eventId);
+            if (event) {
+                event.completed = !event.completed;
+                renderCalendar();
+                showToast(`Event "${event.title}" marked ${event.completed ? 'completed' : 'pending'}.`, 'info');
+            }
+        }
+    });
+
+    $('.close-btn[data-target-modal], .btn-secondary[data-target-modal]').on('click', function() {
+        const modalId = $(this).data('target-modal');
+        $('#' + modalId).removeClass('show');
+    });
+    $('.modal').on('click', function(event) { 
+        if (event.target === this) { $(this).removeClass('show'); }
+    });
+
+    renderCalendar(); 
+
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', () => $sidebar.toggleClass('open'));
+    $(document).on('click', (event) => { 
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+        }
+    });
+
+    $('#filterScheduleBtn').on('click', () => showToast('Filter functionality coming soon!', 'info'));
+    $('#exportScheduleBtn').on('click', () => showToast('Schedule export initiated (simulated).', 'info'));
+    $('#exportMonthlyReportBtn').on('click', () => showToast('Monthly overview export initiated.', 'info'));
+});
+    </script>
+</body>
+</html>

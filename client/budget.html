@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Overview | MaintSys Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <!-- Client Sidebar (Assume same, with "My Budget" active) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li class="active"><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Budget Overview</h1>
+                <p class="subheader">Track your maintenance spending and budget utilization.</p>
+            </header>
+
+            <section class="page-controls-bar">
+                <div class="filter-group">
+                    <label for="contractSelect"><i class="fas fa-file-contract"></i> Select Contract:</label>
+                    <select id="contractSelect" class="form-control" style="min-width: 250px;">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="budgetPeriodSelect"><i class="fas fa-calendar-alt"></i> Period:</label>
+                    <select id="budgetPeriodSelect" class="form-control" style="min-width: 180px;">
+                        <option value="current_month">Current Month</option>
+                        <option value="last_month">Last Month</option>
+                        <option value="current_quarter">Current Quarter</option>
+                        <option value="year_to_date">Year to Date</option>
+                        <option value="custom_range">Custom Range</option>
+                    </select>
+                </div>
+                <div class="filter-group date-range-inputs" id="customDateRangeBudget" style="display: none;">
+                     <input type="date" id="budgetStartDate" class="form-control">
+                     <span class="text-muted mx-1">to</span>
+                     <input type="date" id="budgetEndDate" class="form-control">
+                </div>
+                <div class="action-group">
+                     <button class="btn btn-primary" id="applyBudgetFiltersBtn"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                    <button class="btn btn-outline" id="exportBudgetBtn"><i class="fas fa-download"></i> Export Report</button>
+                </div>
+            </section>
+
+            <!-- Budget Summary KPIs -->
+            <section class="kpi-cards-section budget-summary-kpis">
+                <div class="kpi-card horizontal-kpi">
+                    <div class="kpi-content"><p class="kpi-label">Total Budget</p><h4 class="kpi-value" id="totalBudgetValue">$0.00</h4></div>
+                    <div class="kpi-icon-wrapper" style="background-color: #e6f7ff;"><i class="fas fa-coins kpi-icon" style="color: #1890ff;"></i></div>
+                </div>
+                <div class="kpi-card horizontal-kpi">
+                    <div class="kpi-content"><p class="kpi-label">Amount Spent</p><h4 class="kpi-value" id="spentAmountValue">$0.00</h4></div>
+                    <div class="kpi-icon-wrapper" style="background-color: #fff2e8;"><i class="fas fa-money-bill-wave kpi-icon" style="color: #fa8c16;"></i></div>
+                </div>
+                <div class="kpi-card horizontal-kpi">
+                    <div class="kpi-content"><p class="kpi-label">Remaining Budget</p><h4 class="kpi-value" id="remainingBudgetValue">$0.00</h4></div>
+                    <div class="kpi-icon-wrapper" style="background-color: #f6ffed;"><i class="fas fa-piggy-bank kpi-icon" style="color: #52c41a;"></i></div>
+                </div>
+            </section>
+            
+            <!-- Budget Usage Bar & Alert -->
+            <section class="budget-usage-details card">
+                 <div class="card-body">
+                    <div class="usage-header">
+                        <h4>Budget Utilization</h4>
+                        <span class="usage-percentage" id="budgetUsageText">0%</span>
+                    </div>
+                    <div class="progress-bar-container large-progress">
+                        <div class="progress-bar" id="budgetUsageProgressBar" style="width: 0%;"></div>
+                    </div>
+                    <div class="alert alert-warning mt-3" id="budgetUsageAlert" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Heads up!</strong> Your budget usage is high for the selected period.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Spending Trend Chart -->
+            <section class="budget-trend-chart card">
+                <div class="card-header">
+                    <h3>Spending Trend</h3>
+                    <select id="chartTimeframeSelect" class="form-control form-control-sm" style="max-width: 150px;">
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-wrapper" style="height: 300px;">
+                        <canvas id="monthlySpendingChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Transactions Table -->
+            <section class="table-section card budget-transactions-table">
+                <div class="card-header">
+                    <h3>Recent Transactions</h3>
+                     <input type="text" id="searchTransactions" class="form-control form-control-sm" placeholder="Search transactions..." style="max-width: 250px;">
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="budgetTransactionsTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Request ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="client_budget_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data ---
+    const clientContracts = [
+        { id: 'CON001', name: 'Primary Fleet Contract (CON001)', totalBudget: 15000, currency: '$' },
+        { id: 'CON002', name: 'Equipment Maintenance (CON002)', totalBudget: 8000, currency: '$' }
+    ];
+
+    let currentContractId = clientContracts[0].id; // Default to first contract
+    let spendingChartInstance = null;
+    let transactionsTableInstance = null;
+
+    // Data for a selected contract and period (would be fetched)
+    let budgetData = {
+        totalAllocated: 0,
+        spent: 0,
+        remaining: 0,
+        usagePercent: 0,
+        monthlySpending: [], // { month: 'Jan', spent: 500, budget: 1250 }
+        transactions: []    // { date: '2023-10-20', requestId: 'REQ075', vehicle: 'Sedan XYZ', description: 'Oil Change', amount: 150.00 }
+    };
+
+    // --- Populate Contract Select ---
+    function populateContractSelect() {
+        const $select = $('#contractSelect');
+        $select.empty();
+        clientContracts.forEach(contract => {
+            $select.append(`<option value="${contract.id}">${contract.name}</option>`);
+        });
+        $select.val(currentContractId); // Select the current default
+    }
+    populateContractSelect();
+
+    // --- Helper Functions ---
+    function formatCurrency(amount, currency = '$') {
+        return currency + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function getCssVariableValue(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim(); }
+    function showToast(message, type = 'info') { /* ... same as previous ... */ }
+
+
+    // --- Fetch and Update Budget Data (Simulated) ---
+    function fetchAndUpdateBudgetData() {
+        const selectedContract = clientContracts.find(c => c.id === currentContractId);
+        const period = $('#budgetPeriodSelect').val();
+        // In real app, use period, startDate, endDate to fetch data for 'selectedContract'
+
+        // Simulate fetching
+        showLoading(true);
+        setTimeout(() => {
+            // Mock data generation based on selected contract and period (very simplified)
+            const baseBudget = selectedContract.totalBudget / (period === 'year_to_date' ? 1 : (period === 'current_quarter' ? 4 : 12)); // Monthly equivalent
+            const spentRandomFactor = Math.random() * 0.4 + 0.3; // Spend between 30% and 70%
+            
+            budgetData.totalAllocated = baseBudget;
+            budgetData.spent = parseFloat((baseBudget * spentRandomFactor).toFixed(2));
+            budgetData.remaining = parseFloat((baseBudget - budgetData.spent).toFixed(2));
+            budgetData.usagePercent = baseBudget > 0 ? (budgetData.spent / baseBudget) * 100 : 0;
+
+            // Mock monthly spending for chart (for current_month, only show one bar, etc.)
+            budgetData.monthlySpending = [
+                { month: 'Prev Mon 1', spent: baseBudget * (Math.random()*0.3 + 0.2), budget: baseBudget },
+                { month: 'Prev Mon 2', spent: baseBudget * (Math.random()*0.3 + 0.3), budget: baseBudget },
+                { month: 'Current Mon', spent: budgetData.spent, budget: baseBudget },
+            ];
+            if (period === "current_month") { // If only current month, chart reflects that
+                 budgetData.monthlySpending = [{ month: 'Current Month', spent: budgetData.spent, budget: baseBudget }];
+            }
+
+
+            // Mock transactions
+            budgetData.transactions = [
+                { date: '2024-05-20', requestId: 'REQ045', vehicle: 'Toyota Hilux', description: 'Scheduled Maintenance A', amount: parseFloat((budgetData.spent * 0.4).toFixed(2)) },
+                { date: '2024-05-15', requestId: 'REQ039', vehicle: 'Ford Ranger', description: 'Brake Pad Replacement', amount: parseFloat((budgetData.spent * 0.3).toFixed(2)) },
+                { date: '2024-05-05', requestId: 'REQ032', vehicle: 'Nissan Navara', description: 'Oil & Filter Change', amount: parseFloat((budgetData.spent * 0.3).toFixed(2)) },
+            ];
+            
+            updateUI();
+            showLoading(false);
+        }, 700);
+    }
+
+    // --- Update UI Elements ---
+    function updateUI() {
+        const currency = clientContracts.find(c => c.id === currentContractId)?.currency || '$';
+        $('#totalBudgetValue').text(formatCurrency(budgetData.totalAllocated, currency));
+        $('#spentAmountValue').text(formatCurrency(budgetData.spent, currency));
+        $('#remainingBudgetValue').text(formatCurrency(budgetData.remaining, currency));
+        
+        $('#budgetUsageText').text(`${budgetData.usagePercent.toFixed(1)}%`);
+        $('#budgetUsageProgressBar').css('width', `${budgetData.usagePercent}%`);
+
+        if (budgetData.usagePercent > 80) {
+            $('#budgetUsageProgressBar').css('background-color', getCssVariableValue('--danger-color'));
+            $('#budgetUsageAlert').show().find('strong').text('Warning!');
+            $('#budgetUsageAlert').find('span').text(budgetData.usagePercent.toFixed(1) + '%');
+        } else if (budgetData.usagePercent > 60) {
+            $('#budgetUsageProgressBar').css('background-color', getCssVariableValue('--warning-color'));
+             $('#budgetUsageAlert').show().find('strong').text('Caution:');
+             $('#budgetUsageAlert').find('span').text(budgetData.usagePercent.toFixed(1) + '%');
+        } else {
+            $('#budgetUsageProgressBar').css('background-color', getCssVariableValue('--info-color'));
+            $('#budgetUsageAlert').hide();
+        }
+
+        renderSpendingChart();
+        renderTransactionsTable();
+    }
+
+    // --- Render Spending Trend Chart ---
+    function renderSpendingChart() {
+        const chartCanvas = document.getElementById('monthlySpendingChart');
+        if (!chartCanvas) return;
+        const ctx = chartCanvas.getContext('2d');
+
+        if (spendingChartInstance) {
+            spendingChartInstance.destroy();
+        }
+        
+        const labels = budgetData.monthlySpending.map(item => item.month);
+        const spentData = budgetData.monthlySpending.map(item => item.spent);
+        const budgetLineData = budgetData.monthlySpending.map(item => item.budget);
+
+
+        spendingChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Spent',
+                        data: spentData,
+                        backgroundColor: getCssVariableValue('--primary-color') + 'BF', // Primary with alpha
+                        borderColor: getCssVariableValue('--primary-color'),
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Budgeted',
+                        data: budgetLineData,
+                        type: 'line', // Overlay as a line
+                        borderColor: getCssVariableValue('--secondary-color'),
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5], // Dashed line for budget
+                        tension: 0.1,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: value => formatCurrency(value) } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { tooltip: { callbacks: { label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}` } } }
+            }
+        });
+    }
+
+    // --- Render Transactions Table ---
+    function renderTransactionsTable() {
+        const $table = $('#budgetTransactionsTable');
+        if ($.fn.DataTable.isDataTable($table)) {
+            transactionsTableInstance.clear().rows.add(budgetData.transactions).draw();
+        } else {
+            transactionsTableInstance = $table.DataTable({
+                data: budgetData.transactions,
+                columns: [
+                    { data: 'date', render: date => new Date(date).toLocaleDateString() },
+                    { data: 'requestId', render: id => `<a href="#">${id}</a>` },
+                    { data: 'vehicle' },
+                    { data: 'description' },
+                    { data: 'amount', className: 'text-danger text-right', render: amount => formatCurrency(amount) }
+                ],
+                searching: true,
+                lengthChange: false,
+                pageLength: 5,
+                info: false,
+                pagingType: "simple",
+                order: [[0, 'desc']], // Sort by date descending
+                language: { 
+                    search: "_INPUT_", 
+                    searchPlaceholder: "Filter transactions...",
+                    emptyTable: "No transactions found for this period.",
+                    paginate: { previous: "<i class='fas fa-chevron-left'></i>", next: "<i class='fas fa-chevron-right'></i>" }
+                }
+            });
+        }
+    }
+    // Custom search for transactions table
+    $('#searchTransactions').on('keyup', function() {
+        transactionsTableInstance.search($(this).val()).draw();
+    });
+
+
+    // --- Event Handlers ---
+    $('#contractSelect').on('change', function() {
+        currentContractId = $(this).val();
+        fetchAndUpdateBudgetData();
+    });
+
+    $('#budgetPeriodSelect').on('change', function() {
+        if ($(this).val() === 'custom_range') {
+            $('#customDateRangeBudget').slideDown();
+        } else {
+            $('#customDateRangeBudget').slideUp();
+            // For non-custom, directly fetch. For custom, wait for Apply button.
+            if ($(this).val() !== 'custom_range') {
+                fetchAndUpdateBudgetData();
+            }
+        }
+    });
+    
+    $('#applyBudgetFiltersBtn').on('click', fetchAndUpdateBudgetData); // Also covers custom range apply
+
+    $('#exportBudgetBtn').on('click', function() {
+        showToast('Simulating budget report export...', 'info');
+        // Add actual export logic here (e.g., using DataTables Buttons or custom CSV/PDF generation)
+    });
+    
+    function showLoading(isLoading) {
+        // Basic loading state, can be improved with an overlay
+        $('#applyBudgetFiltersBtn').prop('disabled', isLoading)
+            .html(isLoading ? '<i class="fas fa-spinner fa-spin"></i> Loading...' : '<i class="fas fa-sync-alt"></i> Refresh Data');
+    }
+
+    // --- Initial Load ---
+    const todayForFilter = new Date();
+    const firstDayCurrentMonth = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth(), 1).toISOString().split('T')[0];
+    const lastDayCurrentMonth = new Date(todayForFilter.getFullYear(), todayForFilter.getMonth() + 1, 0).toISOString().split('T')[0];
+    $('#budgetStartDate').val(firstDayCurrentMonth); // Default for custom range if opened
+    $('#budgetEndDate').val(lastDayCurrentMonth);
+
+    fetchAndUpdateBudgetData(); // Load data for default contract and period
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar-client');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        $('.dashboard-container').toggleClass('sidebar-collapsed-client');
+    });
+     $(document).on('click', function(event) {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+             $('.dashboard-container').removeClass('sidebar-collapsed-client');
+        }
+    });
+});
+    </script>
+</body>
+</html>

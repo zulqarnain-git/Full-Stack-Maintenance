@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contracts Management | Admin Dashboard</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <button class="hamburger-menu" id="hamburgerMenu"><i class="fas fa-bars"></i></button>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li ><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li class="active"><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <header class="content-header">
+                <h1>Contracts</h1>
+                <div class="header-actions">
+                    <input type="text" id="globalSearch" class="form-control" placeholder="Search contracts..." style="max-width: 250px;">
+                    <button class="btn btn-secondary" id="importContractsBtn"><i class="fas fa-file-import"></i> Import</button>
+                    <button class="btn btn-primary" id="addContractBtn"><i class="fas fa-plus"></i> Add Contract</button>
+                </div>
+            </header>
+
+            <section class="content-section">
+                <!-- Summary Cards -->
+                <div class="summary-cards-grid">
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-icon icon-blue"><i class="fas fa-file-invoice-dollar"></i></div>
+                            <div class="summary-card-content">
+                                <h3>Total Contract Value</h3>
+                                <div class="value" id="totalBudget">$0</div>
+                                <div class="sub-value" id="activeContractsCount">0 active contracts</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-icon icon-green"><i class="fas fa-chart-pie"></i></div>
+                            <div class="summary-card-content">
+                                <h3>Budget Utilized</h3>
+                                <div class="value" id="totalSpent">$0</div>
+                                <div class="sub-value" id="averageUtilization">0% of total budget</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-card-header">
+                            <div class="summary-card-icon icon-purple"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="summary-card-content">
+                                <h3>Avg. Duration</h3>
+                                <div class="value" id="averageDuration">0 months</div>
+                                <div class="sub-value">Average contract length</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="clientFilter">Client:</label>
+                        <select id="clientFilter" class="form-control">
+                            <option value="">All Clients</option>
+                            <!-- Clients will be populated by JS -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dateRangeFilter">Date Range (End Date):</label>
+                        <input type="text" id="dateRangeFilter" class="form-control" placeholder="Select date range">
+                    </div>
+                </div>
+                
+                <!-- Contracts Table -->
+                <div class="table-card">
+                    <table id="contractsTable" class="display compact" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Contract Name</th>
+                                <th>Client</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Budget</th>
+                                <th>Utilization</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Contract Modal -->
+    <div class="modal" id="contractModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="modalTitle">Add New Contract</h4>
+                    <button type="button" class="modal-close-btn" data-dismiss="modal">×</button>
+                </div>
+                <form id="contractForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="contractId">
+                        <div class="form-group">
+                            <label for="contractName">Contract Name *</label>
+                            <input type="text" class="form-control" id="contractName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contractClient">Client *</label>
+                            <input type="text" class="form-control" id="contractClient" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contractStartDate">Start Date *</label>
+                                <input type="date" class="form-control" id="contractStartDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contractEndDate">End Date *</label>
+                                <input type="date" class="form-control" id="contractEndDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contractBudget">Budget ($) *</label>
+                                <input type="number" class="form-control" id="contractBudget" min="0" step="0.01" required>
+                            </div>
+                             <div class="form-group">
+                                <label for="contractStatus">Status</label>
+                                <select id="contractStatus" class="form-control">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="expired">Expired</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="saveContractBtn">Save Contract</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Contract Modal -->
+    <div class="modal" id="viewContractModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Contract Details</h4>
+                    <button type="button" class="modal-close-btn" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="view-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <p><strong>Contract ID:</strong> <span id="viewContractId" class="font-mono"></span></p>
+                            <p><strong>Contract Name:</strong> <span id="viewContractName"></span></p>
+                            <p><strong>Client:</strong> <span id="viewContractClient"></span></p>
+                        </div>
+                        <div>
+                            <p><strong>Start Date:</strong> <span id="viewContractStartDate"></span></p>
+                            <p><strong>End Date:</strong> <span id="viewContractEndDate"></span></p>
+                            <p><strong>Status:</strong> <span id="viewContractStatus" class="badge"></span></p>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <hr style="margin: 10px 0;">
+                        </div>
+                        <div>
+                            <p><strong>Total Budget:</strong> <span id="viewContractBudget"></span></p>
+                             <p><strong>Spent:</strong> <span id="viewContractSpent"></span></p>
+                        </div>
+                        <div>
+                           <p><strong>Utilization:</strong></p>
+                           <div class="utilization-cell" style="margin-top:5px;">
+                               <div class="progress-info">
+                                   <span id="viewSpentAmountDisplay"></span>
+                                   <span id="viewUtilizationPercentDisplay"></span>
+                               </div>
+                               <div class="progress-bar-container">
+                                   <div class="progress-bar-fill" id="viewUtilizationProgressBar"></div>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editFromViewBtn"><i class="fas fa-edit"></i> Edit Contract</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Modal (Placeholder) -->
+    <div class="modal" id="importModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Import Contracts</h4>
+                    <button type="button" class="modal-close-btn" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>Import functionality (e.g., from CSV or Excel) would be implemented here.</p>
+                    <div class="form-group">
+                        <label for="importFile">Upload File:</label>
+                        <input type="file" id="importFile" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Start Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Placeholder -->
+    <div id="toastNotification" class="toast-notification">
+        <span class="icon"><i class="fas fa-check-circle"></i></span>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script>
+        // Mock data (similar to Code 1)
+        let contracts = [
+            { id: 'CON-2025-001', name: 'Annual Vehicle Maintenance', client: 'ABC Corporation', startDate: '2025-01-01', endDate: '2025-12-31', budget: 50000, spent: 12450, status: 'active' },
+            { id: 'CON-2025-002', name: 'Fleet Servicing Agreement', client: 'XYZ Industries', startDate: '2025-02-15', endDate: '2026-02-14', budget: 75000, spent: 18750, status: 'active' },
+            { id: 'CON-2025-003', name: 'Quarterly Maintenance', client: 'Global Logistics', startDate: '2025-03-01', endDate: '2026-02-28', budget: 28000, spent: 7000, status: 'active' },
+            { id: 'CON-2024-004', name: 'Old Parts Supply', client: 'Tech Solutions Inc', startDate: '2024-01-01', endDate: '2024-12-31', budget: 60000, spent: 58000, status: 'expired' },
+            { id: 'CON-2025-005', name: 'Software Support', client: 'Innovate Ltd', startDate: '2025-06-01', endDate: '2025-08-30', budget: 15000, spent: 1500, status: 'inactive' },
+        ];
+
+        let contractsTable;
+
+        // Utility Functions
+        const formatCurrency = (amount) => `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        const formatDate = (dateString) => moment(dateString).format('MMM D, YYYY');
+        const getInputDate = (dateString) => moment(dateString).format('YYYY-MM-DD');
+
+        function getStatusBadge(status) {
+            status = status.toLowerCase();
+            if (status === 'active') return '<span class="badge badge-success">Active</span>';
+            if (status === 'inactive') return '<span class="badge badge-secondary">Inactive</span>';
+            if (status === 'expired') return '<span class="badge badge-danger">Expired</span>';
+            return `<span class="badge badge-info">${status}</span>`;
+        }
+
+        function calculateUtilization(spent, budget) {
+            if (budget === 0) return { percentage: 0, colorClass: 'bg-teal' };
+            const percentage = (spent / budget) * 100;
+            let colorClass = 'bg-teal';
+            if (percentage > 90) colorClass = 'bg-red';
+            else if (percentage > 70) colorClass = 'bg-yellow';
+            return { percentage: Math.min(percentage, 100), colorClass };
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = $('#toastNotification');
+            const icon = toast.find('.icon i');
+            $('#toastMessage').text(message);
+            
+            toast.removeClass('success error').addClass(type);
+            icon.removeClass('fa-check-circle fa-exclamation-circle');
+            if (type === 'success') {
+                icon.addClass('fa-check-circle');
+            } else {
+                icon.addClass('fa-exclamation-circle');
+            }
+
+            toast.addClass('show');
+            setTimeout(() => toast.removeClass('show'), 3000);
+        }
+
+        function updateSummaryCards() {
+            const activeContracts = contracts.filter(c => c.status === 'active');
+            const totalBudget = contracts.reduce((sum, c) => sum + c.budget, 0);
+            const totalSpent = contracts.reduce((sum, c) => sum + c.spent, 0);
+            
+            $('#totalBudget').text(formatCurrency(totalBudget));
+            $('#activeContractsCount').text(`${activeContracts.length} active contracts`);
+            $('#totalSpent').text(formatCurrency(totalSpent));
+            
+            const averageUtilization = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+            $('#averageUtilization').text(`${averageUtilization.toFixed(1)}% of total budget`);
+
+            if (contracts.length > 0) {
+                const totalDurationDays = contracts.reduce((sum, c) => {
+                    const start = moment(c.startDate);
+                    const end = moment(c.endDate);
+                    return sum + end.diff(start, 'days');
+                }, 0);
+                const avgDurationMonths = (totalDurationDays / contracts.length / 30.44).toFixed(0); // Avg days in month
+                $('#averageDuration').text(`${avgDurationMonths} months`);
+            } else {
+                 $('#averageDuration').text(`0 months`);
+            }
+        }
+        
+        function populateClientFilter() {
+            const clients = [...new Set(contracts.map(c => c.client))].sort();
+            const clientFilter = $('#clientFilter');
+            clientFilter.find('option:not(:first)').remove(); // Clear existing options except "All Clients"
+            clients.forEach(client => {
+                clientFilter.append(`<option value="${client}">${client}</option>`);
+            });
+        }
+
+        function renderTable() {
+            if (contractsTable) {
+                contractsTable.clear().draw();
+            }
+            
+            const tableBody = $('#contractsTable tbody');
+            tableBody.empty(); // Clear existing rows
+
+            contracts.forEach(contract => {
+                const util = calculateUtilization(contract.spent, contract.budget);
+                const row = `
+                    <tr data-id="${contract.id}">
+                        <td class="font-mono">${contract.id}</td>
+                        <td>${contract.name}</td>
+                        <td>${contract.client}</td>
+                        <td>${formatDate(contract.startDate)}</td>
+                        <td>${formatDate(contract.endDate)}</td>
+                        <td>${formatCurrency(contract.budget)}</td>
+                        <td class="utilization-cell">
+                            <div class="progress-info">
+                                <span>${formatCurrency(contract.spent)}</span>
+                                <span>${util.percentage.toFixed(1)}%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill ${util.colorClass}" style="width: ${util.percentage}%;"></div>
+                            </div>
+                        </td>
+                        <td>${getStatusBadge(contract.status)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-icon btn-view" title="View"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-icon btn-edit" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-icon btn-delete" title="Delete"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+
+            if (!contractsTable) {
+                contractsTable = $('#contractsTable').DataTable({
+                    responsive: true,
+                    "pageLength": 10,
+                    "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+                    "language": {
+                        "search": "", // Hides default search label
+                        "searchPlaceholder": "Search within table..." 
+                    },
+                    // Order by ID descending initially if desired, or remove for default order
+                    // "order": [[0, "desc"]], 
+                    "columnDefs": [
+                        { "targets": [8], "orderable": false, "searchable": false } // Actions column
+                    ]
+                });
+                 // Custom global search
+                $('#globalSearch').on('keyup', function () {
+                    contractsTable.search(this.value).draw();
+                });
+            } else {
+                 contractsTable.rows.add($(tableBody.find('tr'))).draw();
+            }
+            updateSummaryCards();
+            populateClientFilter();
+        }
+        
+        // Modal Handling
+        function openModal(modalId) { $(modalId).addClass('active'); }
+        function closeModal(modalId) { $(modalId).removeClass('active'); }
+
+        $(document).ready(function() {
+            renderTable(); // Initial render
+
+            // Hamburger Menu
+            $('#hamburgerMenu').on('click', function() {
+                $('#sidebar').toggleClass('open');
+                $('#mainContent').toggleClass('sidebar-open');
+            });
+
+            // Add Contract
+            $('#addContractBtn').on('click', function() {
+                $('#contractForm')[0].reset();
+                $('#modalTitle').text('Add New Contract');
+                $('#contractId').val(''); // Ensure ID is clear for new contract
+                // Set default dates for new contract
+                $('#contractStartDate').val(moment().format('YYYY-MM-DD'));
+                $('#contractEndDate').val(moment().add(1, 'year').format('YYYY-MM-DD'));
+                openModal('#contractModal');
+            });
+
+            // Edit Contract
+            $('#contractsTable tbody').on('click', '.btn-edit', function() {
+                const contractId = $(this).closest('tr').data('id');
+                const contract = contracts.find(c => c.id === contractId);
+                if (contract) {
+                    $('#modalTitle').text('Edit Contract');
+                    $('#contractId').val(contract.id);
+                    $('#contractName').val(contract.name);
+                    $('#contractClient').val(contract.client);
+                    $('#contractStartDate').val(getInputDate(contract.startDate));
+                    $('#contractEndDate').val(getInputDate(contract.endDate));
+                    $('#contractBudget').val(contract.budget);
+                    $('#contractStatus').val(contract.status);
+                    openModal('#contractModal');
+                }
+            });
+
+            // Save Contract (Add/Edit)
+            $('#contractForm').on('submit', function(e) {
+                e.preventDefault();
+                const id = $('#contractId').val();
+                const newContractData = {
+                    name: $('#contractName').val(),
+                    client: $('#contractClient').val(),
+                    startDate: $('#contractStartDate').val(),
+                    endDate: $('#contractEndDate').val(),
+                    budget: parseFloat($('#contractBudget').val()),
+                    status: $('#contractStatus').val(),
+                    spent: id ? contracts.find(c => c.id === id).spent : 0 // Keep existing spent on edit, 0 for new
+                };
+
+                if (id) { // Editing
+                    const index = contracts.findIndex(c => c.id === id);
+                    contracts[index] = { ...contracts[index], ...newContractData };
+                    showToast('Contract updated successfully!');
+                } else { // Adding
+                    const year = new Date().getFullYear();
+                    newContractData.id = `CON-${year}-${String(contracts.length + 1).padStart(3, '0')}`;
+                    contracts.push(newContractData);
+                    showToast('Contract added successfully!');
+                }
+                renderTable();
+                closeModal('#contractModal');
+            });
+
+            // View Contract
+            $('#contractsTable tbody').on('click', '.btn-view', function() {
+                const contractId = $(this).closest('tr').data('id');
+                const contract = contracts.find(c => c.id === contractId);
+                if (contract) {
+                    $('#viewContractId').text(contract.id);
+                    $('#viewContractName').text(contract.name);
+                    $('#viewContractClient').text(contract.client);
+                    $('#viewContractStartDate').text(formatDate(contract.startDate));
+                    $('#viewContractEndDate').text(formatDate(contract.endDate));
+                    
+                    const statusBadge = $(getStatusBadge(contract.status));
+                    $('#viewContractStatus').empty().append(statusBadge);
+
+                    $('#viewContractBudget').text(formatCurrency(contract.budget));
+                    $('#viewContractSpent').text(formatCurrency(contract.spent));
+                    
+                    const util = calculateUtilization(contract.spent, contract.budget);
+                    $('#viewSpentAmountDisplay').text(formatCurrency(contract.spent));
+                    $('#viewUtilizationPercentDisplay').text(`${util.percentage.toFixed(1)}%`);
+                    $('#viewUtilizationProgressBar').removeClass('bg-teal bg-yellow bg-red').addClass(util.colorClass).css('width', `${util.percentage}%`);
+                    
+                    // Store ID for "Edit from View" button
+                    $('#editFromViewBtn').data('id', contract.id);
+
+                    openModal('#viewContractModal');
+                }
+            });
+            
+            // Edit from View button
+            $('#editFromViewBtn').on('click', function() {
+                const contractId = $(this).data('id');
+                closeModal('#viewContractModal');
+                // Simulate click on the edit button in the table
+                $(`#contractsTable tbody tr[data-id="${contractId}"] .btn-edit`).click();
+            });
+
+            // Delete Contract
+            $('#contractsTable tbody').on('click', '.btn-delete', function() {
+                if (confirm('Are you sure you want to delete this contract?')) {
+                    const contractId = $(this).closest('tr').data('id');
+                    contracts = contracts.filter(c => c.id !== contractId);
+                    renderTable();
+                    showToast('Contract deleted successfully!', 'success');
+                }
+            });
+            
+            // Import Contracts Button
+            $('#importContractsBtn').on('click', function() {
+                openModal('#importModal');
+            });
+
+            // Modal Close Buttons
+            $('[data-dismiss="modal"]').on('click', function() {
+                closeModal($(this).closest('.modal').attr('id'));
+            });
+            // Close modal on ESC key
+            $(document).on('keydown', function(event) {
+                if (event.key === "Escape") {
+                    $('.modal.active').each(function() {
+                        closeModal('#' + $(this).attr('id'));
+                    });
+                }
+            });
+
+
+            // Filters
+            $('#statusFilter').on('change', function() {
+                contractsTable.column(7).search(this.value ? `^${this.value}$` : '', true, false).draw();
+                // For searching HTML content:
+                // contractsTable.column(7).search(this.value ? $(`<span>${this.value}</span>`).text() : '').draw();
+            });
+            $('#clientFilter').on('change', function() {
+                contractsTable.column(2).search(this.value).draw();
+            });
+
+            // Date Range Picker
+            $('#dateRangeFilter').daterangepicker({
+                autoUpdateInput: false,
+                locale: { cancelLabel: 'Clear', format: 'YYYY-MM-DD' },
+                ranges: {
+                   'Today': [moment(), moment()],
+                   'Next 7 Days': [moment(), moment().add(6, 'days')],
+                   'Next 30 Days': [moment(), moment().add(29, 'days')],
+                   'This Month': [moment().startOf('month'), moment().endOf('month')],
+                   'Next Month': [moment().add(1, 'month').startOf('month'), moment().add(1, 'month').endOf('month')]
+                }
+            });
+            $('#dateRangeFilter').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+                // Custom filtering function for date range (based on End Date column - index 4)
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        var min = picker.startDate;
+                        var max = picker.endDate;
+                        var date = moment(data[4], "MMM D, YYYY"); // Parse date from End Date column
+
+                        if (
+                            (min === null && max === null) ||
+                            (min === null && date <= max) ||
+                            (min <= date && max === null) ||
+                            (min <= date && date <= max)
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    }
+                );
+                contractsTable.draw();
+                $.fn.dataTable.ext.search.pop(); // Remove the specific filter after drawing
+            });
+            $('#dateRangeFilter').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+                // Clear date range filter by redrawing without the custom filter
+                $.fn.dataTable.ext.search.pop(); // Make sure it's popped if one was pushed
+                contractsTable.draw();
+            });
+
+        });
+    </script>
+</body>
+</html>

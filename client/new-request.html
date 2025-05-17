@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Maintenance Request | MaintSys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>New Maintenance Request</h1>
+                <p class="subheader">Submit details for your vehicle maintenance needs.</p>
+            </header>
+
+            <div class="new-request-layout">
+                <!-- Left Column: Form -->
+                <form id="newRequestForm" class="new-request-form-column">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-file-alt form-icon"></i> Request Details</h3></div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="requestTitle">Request Title <span class="required-asterisk">*</span></label>
+                                <input type="text" id="requestTitle" name="requestTitle" class="form-control" placeholder="e.g., Engine noise investigation, Annual service">
+                                <small class="error-message" data-for="requestTitle"></small>
+                            </div>
+                            <div class="form-group">
+                                <label for="requestDescription">Detailed Description <span class="required-asterisk">*</span></label>
+                                <textarea id="requestDescription" name="requestDescription" class="form-control" rows="4" placeholder="Describe the issue, symptoms, or specific services needed..."></textarea>
+                                <small class="error-message" data-for="requestDescription"></small>
+                            </div>
+                             <div class="form-group">
+                                <label for="maintenanceType">Maintenance Type</label>
+                                <select id="maintenanceType" name="maintenanceType" class="form-control">
+                                    <option value="regular">Regular Maintenance</option>
+                                    <option value="repair">Repair</option>
+                                    <option value="emergency">Emergency Repair</option>
+                                    <option value="inspection">Routine Inspection</option>
+                                </select>
+                            </div>
+                             <div class="form-group">
+                                <label for="priority">Priority</label>
+                                <select id="priority" name="priority" class="form-control">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-car form-icon"></i> Vehicle Information</h3></div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="vehicleSelect">Select Vehicle <span class="required-asterisk">*</span></label>
+                                <select id="vehicleSelect" name="vehicleId" class="form-control">
+                                    <option value="">-- Select from your vehicles --</option>
+                                    <!-- Options populated by JS -->
+                                    <option value="new_vehicle">-- Add New Vehicle --</option>
+                                </select>
+                                <small class="error-message" data-for="vehicleId"></small>
+                            </div>
+                            <div id="newVehicleFields" class="new-vehicle-fields" style="display: none;">
+                                <p class="text-muted small mb-2">Enter details for the new vehicle:</p>
+                                <div class="form-group">
+                                    <label for="newVehicleIdentifier">Identifier (e.g., Truck 01, Rego) <span class="required-asterisk">*</span></label>
+                                    <input type="text" id="newVehicleIdentifier" name="newVehicleIdentifier" class="form-control" placeholder="e.g., My Blue Truck or ABC-123">
+                                    <small class="error-message" data-for="newVehicleIdentifier"></small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleMakeModel">Make & Model (e.g., Toyota Hilux)</label>
+                                    <input type="text" id="newVehicleMakeModel" name="newVehicleMakeModel" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="newVehicleNotes">Additional Vehicle Notes (VIN, Year, Color etc.)</label>
+                                    <textarea id="newVehicleNotes" name="newVehicleNotes" class="form-control" rows="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-calendar-alt form-icon"></i> Schedule & Location</h3></div>
+                        <div class="card-body">
+                             <div class="form-group">
+                                <label for="preferredDate">Preferred Date <span class="required-asterisk">*</span></label>
+                                <input type="date" id="preferredDate" name="preferredDate" class="form-control">
+                                <small class="error-message" data-for="preferredDate"></small>
+                            </div>
+                            <div class="form-group">
+                                <label for="preferredTime">Preferred Time (Optional)</label>
+                                <input type="time" id="preferredTime" name="preferredTime" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="serviceLocation">Service Location Address <span class="required-asterisk">*</span></label>
+                                <input type="text" id="serviceLocation" name="serviceLocation" class="form-control" placeholder="e.g., 123 Main St, Your City">
+                                 <small class="error-message" data-for="serviceLocation"></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-paperclip form-icon"></i> Additional Information</h3></div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="authorizedPersonSelect">Authorized Person (for updates/parts)</label>
+                                <select id="authorizedPersonSelect" name="authorizedPersonId" class="form-control">
+                                    <option value="">-- Select or Add New --</option>
+                                    <!-- Options populated by JS -->
+                                    <option value="new_auth_person">-- Add New Authorized Person --</option>
+                                </select>
+                            </div>
+                            <div id="newAuthPersonField" class="form-group" style="display: none;">
+                                <label for="newAuthPersonName">New Authorized Person's Name <span class="required-asterisk">*</span></label>
+                                <input type="text" id="newAuthPersonName" name="newAuthPersonName" class="form-control" placeholder="Full Name">
+                                <small class="error-message" data-for="newAuthPersonName"></small>
+                            </div>
+                            <div class="form-group">
+                                <label for="additionalNotes">Notes for Maintenance Team</label>
+                                <textarea id="additionalNotes" name="additionalNotes" class="form-control" rows="3" placeholder="Any specific instructions or observations for the team..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="fileAttachments">Attachments (Photos, Documents)</label>
+                                <div class="file-drop-area" id="fileDropArea">
+                                    <input type="file" id="fileAttachmentsInput" class="file-input-hidden" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx">
+                                    <div class="file-drop-prompt">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Drag & drop files here, or click to select.</p>
+                                        <small>(Max 5MB per file, up to 5 files)</small>
+                                    </div>
+                                </div>
+                                <div id="filePreviewContainer" class="file-preview-container mt-3">
+                                    <!-- File previews will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-sticky">
+                        <button type="button" class="btn btn-secondary" id="cancelRequestBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Request</button>
+                    </div>
+                </form>
+
+                <!-- Right Column: Informational Sidebar -->
+                <aside class="new-request-info-column">
+                    <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-question-circle"></i> What Happens Next?</h4></div>
+                        <div class="card-body">
+                            <ol class="info-list">
+                                <li>Your request is reviewed by our admin team.</li>
+                                <li>A suitable maintenance representative is assigned.</li>
+                                <li>You'll receive a confirmation with appointment details.</li>
+                                <li>The service will be performed as scheduled.</li>
+                                <li>Track progress in your "Request History".</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-tools"></i> Maintenance Types</h4></div>
+                        <div class="card-body">
+                            <ul class="info-list-styled">
+                                <li><strong>Regular Maintenance:</strong> Oil changes, filter replacements, routine checks.</li>
+                                <li><strong>Repair:</strong> Addressing specific mechanical or electrical issues.</li>
+                                <li><strong>Emergency Repair:</strong> Urgent issues requiring immediate attention.</li>
+                                <li><strong>Routine Inspection:</strong> General vehicle health and safety check-ups.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-car-side"></i> Your Vehicles</h4></div>
+                        <div class="card-body" id="yourVehiclesQuickList">
+                            <!-- Vehicle list populated by JS -->
+                            <p class="text-muted">Loading your vehicles...</p>
+                        </div>
+                         <div class="card-footer text-center">
+                            <a href="#" class="btn btn-sm btn-outline btn-block"><i class="fas fa-plus-circle"></i> Manage My Vehicles</a>
+                        </div>
+                    </div>
+                     <div class="card">
+                        <div class="card-header"><h4><i class="fas fa-headset"></i> Need Help?</h4></div>
+                        <div class="card-body">
+                            <p class="text-muted small">If you encounter any issues or have questions, please contact our support team:</p>
+                            <p class="mt-2"><i class="fas fa-envelope mr-2"></i> support@maintsys.com</p>
+                            <p><i class="fas fa-phone mr-2"></i> (555) 010-1234</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="client_new_request_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data (Replace with actual data fetching) ---
+    const clientVehicles = [
+        { id: 'VEH001', identifier: 'Toyota Hilux (ABC-1234)', makeModel: 'Toyota Hilux', notes: 'Reg: ABC-1234' },
+        { id: 'VEH002', identifier: 'Ford Ranger (XYZ-5678)', makeModel: 'Ford Ranger', notes: 'Reg: XYZ-5678' },
+        { id: 'VEH003', identifier: 'Work Van (VAN-001)', makeModel: 'Mercedes Sprinter', notes: 'Reg: VAN-001, VIN: ...'}
+    ];
+    const authorizedPersons = [
+        { id: 'AUTH001', name: 'John Doe (Site Manager)' },
+        { id: 'AUTH002', name: 'Alice Smith (Fleet Coordinator)' }
+    ];
+    let attachedFiles = []; // To store File objects
+
+    // --- Populate Selects ---
+    function populateVehicleSelect() {
+        const $select = $('#vehicleSelect');
+        $select.find('option:not([value=""], [value="new_vehicle"])').remove(); // Clear old options
+        clientVehicles.forEach(v => {
+            $select.find('option[value="new_vehicle"]').before(`<option value="${v.id}">${v.identifier}</option>`);
+        });
+    }
+    populateVehicleSelect();
+
+    function populateAuthPersonSelect() {
+        const $select = $('#authorizedPersonSelect');
+         $select.find('option:not([value=""], [value="new_auth_person"])').remove();
+        authorizedPersons.forEach(p => {
+            $select.find('option[value="new_auth_person"]').before(`<option value="${p.id}">${p.name}</option>`);
+        });
+    }
+    populateAuthPersonSelect();
+
+    function populateQuickVehicleList() {
+        const $list = $('#yourVehiclesQuickList');
+        $list.empty();
+        if (clientVehicles.length === 0) {
+            $list.append('<p class="text-muted small">No vehicles registered yet. You can add one in the form.</p>');
+            return;
+        }
+        clientVehicles.forEach(v => {
+            $list.append(`<div class="vehicle-item" data-id="${v.id}"><strong>${v.identifier}</strong><small>${v.makeModel || ''}</small></div>`);
+        });
+    }
+    populateQuickVehicleList();
+
+    // --- UI Interactions ---
+    // Toggle new vehicle fields
+    $('#vehicleSelect').on('change', function() {
+        if ($(this).val() === 'new_vehicle') {
+            $('#newVehicleFields').slideDown();
+            $('#newVehicleIdentifier').prop('required', true); // Make required if new
+        } else {
+            $('#newVehicleFields').slideUp();
+            $('#newVehicleIdentifier').prop('required', false);
+            clearErrorFor('newVehicleIdentifier'); // Clear potential error
+            $('#newVehicleFields input, #newVehicleFields textarea').val(''); // Clear fields
+        }
+    });
+
+    // Toggle new authorized person field
+    $('#authorizedPersonSelect').on('change', function() {
+        if ($(this).val() === 'new_auth_person') {
+            $('#newAuthPersonField').slideDown();
+            $('#newAuthPersonName').prop('required', true);
+        } else {
+            $('#newAuthPersonField').slideUp();
+            $('#newAuthPersonName').prop('required', false);
+            clearErrorFor('newAuthPersonName');
+            $('#newAuthPersonName').val('');
+        }
+    });
+
+    // Quick select vehicle from info panel
+    $('#yourVehiclesQuickList').on('click', '.vehicle-item', function() {
+        const vehicleId = $(this).data('id');
+        $('#vehicleSelect').val(vehicleId).trigger('change'); // Set and trigger change to hide new vehicle fields
+        $('html, body').animate({ scrollTop: $('#vehicleSelect').offset().top - 100 }, 500); // Scroll to field
+    });
+
+
+    // File Drag & Drop and Selection
+    const $fileDropArea = $('#fileDropArea');
+    const $fileInput = $('#fileAttachmentsInput');
+    const $filePreviewContainer = $('#filePreviewContainer');
+
+    $fileDropArea.on('dragover dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('dragover');
+    });
+    $fileDropArea.on('dragleave dragend drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+    });
+    $fileDropArea.on('drop', function(e) {
+        handleFiles(e.originalEvent.dataTransfer.files);
+    });
+    $fileDropArea.on('click', function() { $fileInput.click(); });
+    $fileInput.on('change', function(e) { handleFiles(e.target.files); });
+
+    function handleFiles(files) {
+        const maxFiles = 5;
+        const maxFileSizeMB = 5;
+
+        if (attachedFiles.length + files.length > maxFiles) {
+            showToast(`You can upload a maximum of ${maxFiles} files.`, 'warning');
+            return;
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (file.size > maxFileSizeMB * 1024 * 1024) {
+                showToast(`File "${file.name}" exceeds ${maxFileSizeMB}MB limit.`, 'warning');
+                continue;
+            }
+            if (attachedFiles.length < maxFiles) {
+                attachedFiles.push(file);
+            } else {
+                 showToast(`Maximum file count reached (${maxFiles}). Additional files ignored.`, 'warning');
+                break;
+            }
+        }
+        renderFilePreviews();
+        $fileInput.val(''); // Reset file input
+    }
+
+    function renderFilePreviews() {
+        $filePreviewContainer.empty();
+        attachedFiles.forEach((file, index) => {
+            const previewItem = `
+                <div class="file-preview-item" data-index="${index}">
+                    <i class="fas fa-file-alt file-icon"></i>
+                    <span class="file-name" title="${file.name}">${file.name}</span>
+                    <button type="button" class="remove-file-btn"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            $filePreviewContainer.append(previewItem);
+        });
+    }
+
+    $filePreviewContainer.on('click', '.remove-file-btn', function() {
+        const index = $(this).closest('.file-preview-item').data('index');
+        attachedFiles.splice(index, 1);
+        renderFilePreviews();
+    });
+
+    // --- Form Validation ---
+    function validateField(fieldId, condition, errorMessage) {
+        const $field = $('#' + fieldId);
+        const $errorMsg = $(`.error-message[data-for="${fieldId}"]`);
+        if (condition) {
+            $field.removeClass('is-invalid');
+            $errorMsg.text('');
+            return true;
+        } else {
+            $field.addClass('is-invalid');
+            $errorMsg.text(errorMessage);
+            return false;
+        }
+    }
+    function clearErrorFor(fieldId) {
+        $('#' + fieldId).removeClass('is-invalid');
+        $(`.error-message[data-for="${fieldId}"]`).text('');
+    }
+
+    function validateForm() {
+        let isValid = true;
+        isValid = validateField('requestTitle', $('#requestTitle').val().trim() !== '', 'Request title is required.') && isValid;
+        isValid = validateField('requestDescription', $('#requestDescription').val().trim() !== '', 'Detailed description is required.') && isValid;
+        
+        const vehicleSelected = $('#vehicleSelect').val();
+        if (vehicleSelected === '') {
+            isValid = validateField('vehicleSelect', false, 'Please select a vehicle or add a new one.') && isValid;
+        } else if (vehicleSelected === 'new_vehicle') {
+            isValid = validateField('newVehicleIdentifier', $('#newVehicleIdentifier').val().trim() !== '', 'New vehicle identifier is required.') && isValid;
+        } else {
+            clearErrorFor('vehicleSelect');
+            clearErrorFor('newVehicleIdentifier');
+        }
+
+        const preferredDateVal = $('#preferredDate').val();
+        if (!preferredDateVal) {
+            isValid = validateField('preferredDate', false, 'Preferred date is required.') && isValid;
+        } else {
+            const selectedDate = new Date(preferredDateVal);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Compare dates only
+            if (selectedDate < today) {
+                 isValid = validateField('preferredDate', false, 'Preferred date cannot be in the past.') && isValid;
+            } else {
+                clearErrorFor('preferredDate');
+            }
+        }
+        
+        isValid = validateField('serviceLocation', $('#serviceLocation').val().trim() !== '', 'Service location is required.') && isValid;
+
+        if ($('#authorizedPersonSelect').val() === 'new_auth_person') {
+             isValid = validateField('newAuthPersonName', $('#newAuthPersonName').val().trim() !== '', 'New authorized person\'s name is required.') && isValid;
+        } else {
+            clearErrorFor('newAuthPersonName');
+        }
+        return isValid;
+    }
+
+    // Input event listeners to clear errors on change
+    $('#newRequestForm input, #newRequestForm textarea, #newRequestForm select').on('input change', function() {
+        clearErrorFor($(this).attr('id'));
+        // Specific logic for dependent fields
+        if ($(this).attr('id') === 'vehicleSelect') {
+            if ($(this).val() !== 'new_vehicle') clearErrorFor('newVehicleIdentifier');
+        }
+        if ($(this).attr('id') === 'authorizedPersonSelect') {
+            if ($(this).val() !== 'new_auth_person') clearErrorFor('newAuthPersonName');
+        }
+    });
+
+
+    // --- Form Submission ---
+    $('#newRequestForm').on('submit', function(e) {
+        e.preventDefault();
+        if (!validateForm()) {
+            showToast('Please correct the errors in the form.', 'error');
+            // Scroll to the first error
+            const firstError = $('.is-invalid').first();
+            if (firstError.length) {
+                $('html, body').animate({ scrollTop: firstError.offset().top - 100 }, 500);
+            }
+            return;
+        }
+
+        const formData = new FormData(this); // Collects form data including files
+        attachedFiles.forEach((file, index) => {
+            formData.append(`attachments[${index}]`, file); // Ensure files are added correctly
+        });
+
+        // For demonstration, log FormData content
+        console.log("Form Data to be submitted:");
+        for (let [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(key + ':', value.name, `(${value.size} bytes)`);
+            } else {
+                console.log(key + ':', value);
+            }
+        }
+
+        // Simulate API call
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalBtnText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...');
+
+        setTimeout(() => {
+            // Simulate success
+            Swal.fire({
+                title: 'Request Submitted!',
+                text: 'Your maintenance request has been successfully submitted. Request ID: REQ' + Math.floor(1000 + Math.random() * 9000),
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Reset form or redirect
+                $('#newRequestForm')[0].reset();
+                attachedFiles = [];
+                renderFilePreviews();
+                $('#newVehicleFields').hide();
+                $('#newAuthPersonField').hide();
+                populateVehicleSelect(); // Re-populate in case a new one was added (simulated)
+                populateAuthPersonSelect();
+                // window.location.href = "client_dashboard.html"; // Optional: redirect
+            });
+            submitBtn.prop('disabled', false).html(originalBtnText);
+        }, 1500);
+    });
+    
+    $('#cancelRequestBtn').on('click', function() {
+        // Optionally confirm before cancelling if form has data
+        if (confirm("Are you sure you want to cancel? Any unsaved data will be lost.")) {
+             $('#newRequestForm')[0].reset();
+             attachedFiles = [];
+             renderFilePreviews();
+             $('#newVehicleFields').hide();
+             $('#newAuthPersonField').hide();
+             // Potentially redirect or clear all errors
+             $('.error-message').text('');
+             $('.form-control').removeClass('is-invalid');
+        }
+    });
+
+
+    // --- Toast Notification ---
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info warning').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3500);
+    }
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar-client');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        $('.dashboard-container').toggleClass('sidebar-collapsed-client');
+    });
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+            $('.dashboard-container').removeClass('sidebar-collapsed-client');
+        }
+    });
+});
+    </script>
+</body>
+</html>

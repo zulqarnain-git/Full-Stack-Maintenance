@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request History | MaintSys Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/client.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container client-dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="new-request.html"><i class="fas fa-plus-circle"></i> New Request</a></li>
+                    <li class="active"><a href="history.html"><i class="fas fa-history"></i> Request History</a></li>
+                    <li><a href="budget.html"><i class="fas fa-wallet"></i> My Budget</a></li>
+                    <li><a href="vehicles.html"><i class="fas fa-car"></i> My Vehicles</a></li>
+                    <li><a href="authorized.html"><i class="fas fa-user-check"></i> Authorized Persons</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li> 
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Client User</span>
+                        <span class="user-role">User</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Request History</h1>
+                <p class="subheader">View and track all your past and current maintenance requests.</p>
+            </header>
+
+            <!-- KPI Summary Cards -->
+            
+            <section class="kpi-cards-section request-history-kpis">
+                <div class="kpi-card" data-status-filter="all">
+                    <div class="icon" style="background-color: #e9ecef; color: var(--secondary-color);"><i class="fas fa-list-ul"></i></div>
+                    <div class="text"><h4 id="countTotal">0</h4><p>Total Requests</p></div>
+                </div>
+                <div class="kpi-card" data-status-filter="pending">
+                    <div class="icon" style="background-color: #fff3cd; color: #856404;"><i class="fas fa-hourglass-half"></i></div>
+                    <div class="text"><h4 id="countPending">0</h4><p>Pending</p></div>
+                </div>
+                 <div class="kpi-card" data-status-filter="approved"> <!-- Combined Approved & In-Progress -->
+                    <div class="icon" style="background-color: #d1ecf1; color: #0c5460;"><i class="fas fa-thumbs-up"></i></div>
+                    <div class="text"><h4 id="countApproved">0</h4><p>Approved</p></div>
+                </div>
+                <div class="kpi-card" data-status-filter="in-progress">
+                    <div class="icon" style="background-color: #cce5ff; color: #004085;"><i class="fas fa-cogs"></i></div>
+                    <div class="text"><h4 id="countInProgress">0</h4><p>In Progress</p></div>
+                </div>
+                <div class="kpi-card" data-status-filter="completed">
+                    <div class="icon" style="background-color: #d4edda; color: #155724;"><i class="fas fa-check-circle"></i></div>
+                    <div class="text"><h4 id="countCompleted">0</h4><p>Completed</p></div>
+                </div>
+                <div class="kpi-card" data-status-filter="rejected">
+                    <div class="icon" style="background-color: #f8d7da; color: #721c24;"><i class="fas fa-times-circle"></i></div>
+                    <div class="text"><h4 id="countRejected">0</h4><p>Rejected</p></div>
+                </div>
+            </section>
+
+            <!-- Table Section -->
+            <section class="table-section card">
+                <div class="card-header">
+                    <h2>All Requests</h2>
+                    <div class="table-actions">
+                        <a href="client_new_request.html" class="btn btn-primary"><i class="fas fa-plus"></i> New Request</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-filters-bar">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="globalSearchRequests" placeholder="Search by ID, Vehicle..." class="form-control">
+                        </div>
+                        <select id="statusFilterTable" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <input type="date" id="dateFilterStart" class="form-control" title="Start Date">
+                        <span class="text-muted mx-1">to</span>
+                        <input type="date" id="dateFilterEnd" class="form-control" title="End Date">
+                        <button id="clearDateFiltersBtn" class="btn btn-sm btn-outline" title="Clear Dates"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="requestHistoryTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Req. ID</th>
+                                    <th>Vehicle</th>
+                                    <th>Reg. No.</th>
+                                    <th>Type</th>
+                                    <th>Submitted</th>
+                                    <th>Status</th>
+                                    <th>Representative</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <div id="toastNotification" class="toast"><span id="toastMessage"></span></div>
+        </main>
+    </div>
+
+    <!-- Modal for Viewing Request Details -->
+    <div id="requestDetailModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h4 id="modalTitle">Request Details: <span id="modalRequestId"></span></h4>
+                <button class="close-btn" id="closeModalBtn">×</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <!-- Dynamic content here -->
+                <p>Loading details...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="modalDownloadPdfBtn">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+                <button type="button" class="btn btn-secondary" id="modalCloseFooterBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="client_history_script.js"></script>
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data ---
+    let allClientRequests = [
+        { id: 'REQ045', vehicleName: 'Toyota Hilux', vehicleCode: 'ABC-1234', type: 'Regular Maintenance', date: '2024-05-06', status: 'pending', representative: null, parts: ['Oil Change Kit', 'Air Filter'], description: 'Standard 50,000km service.', notes: 'Check tire pressure.', preferredDate: '2024-05-10', preferredTime: '10:00', location: 'Client Site A' },
+        { id: 'REQ039', vehicleName: 'Ford Ranger', vehicleCode: 'XYZ-5678', type: 'Emergency Repair', date: '2024-04-28', status: 'approved', representative: 'James Wilson', parts: ['Radiator Hose', 'Coolant'], description: 'Overheating issue, suspected hose leak.', notes: 'Urgent attention needed.', preferredDate: '2024-04-28', preferredTime: 'ASAP', location: 'Highway Exit 15' },
+        { id: 'REQ032', vehicleName: 'Nissan Navara', vehicleCode: 'DEF-9012', type: 'Regular Maintenance', date: '2024-04-15', status: 'in-progress', representative: 'Maria Rodriguez', parts: ['Brake Pads', 'Brake Fluid'], description: 'Brake replacement and fluid check.', notes: '', preferredDate: '2024-04-20', preferredTime: '14:00', location: 'Main Workshop' },
+        { id: 'REQ027', vehicleName: 'Toyota LC', vehicleCode: 'GHI-3456', type: 'Routine Inspection', date: '2024-04-02', status: 'completed', representative: 'Lisa Chen', parts: ['Wiper Blades'], description: 'Annual safety inspection.', notes: 'All checks passed.', preferredDate: '2024-04-02', preferredTime: '09:00', location: 'Client HQ' },
+        { id: 'REQ021', vehicleName: 'Toyota Hilux', vehicleCode: 'ABC-1234', type: 'Repair', date: '2024-03-15', status: 'rejected', representative: null, parts: ['Gearbox Assembly'], description: 'Transmission slipping.', notes: 'Quote requested first.', rejectionReason: 'Repair cost exceeds pre-approved limit. Awaiting client confirmation.', preferredDate: '2024-03-20', preferredTime: '', location: 'Client Site A'},
+        { id: 'REQ018', vehicleName: 'Ford Ranger', vehicleCode: 'XYZ-5678', type: 'Regular Maintenance', date: '2024-03-01', status: 'completed', representative: 'David Kim', parts: ['Spark Plugs', 'Fuel Filter'], description: 'Tune-up service.', notes: '', preferredDate: '2024-03-01', preferredTime: '13:00', location: 'Main Workshop' }
+    ];
+
+    let requestHistoryTable; // DataTable instance
+
+    // --- Helper Functions ---
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    function getStatusBadge(status) {
+        let badgeClass = 'badge-secondary'; // Default
+        if (status === 'completed') badgeClass = 'badge-success';
+        else if (status === 'pending') badgeClass = 'badge-light text-dark border'; // Light with border
+        else if (status === 'approved') badgeClass = 'badge-info';
+        else if (status === 'in-progress') badgeClass = 'badge-warning';
+        else if (status === 'rejected') badgeClass = 'badge-danger';
+        return `<span class="badge ${badgeClass}">${status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}</span>`;
+    }
+    function showToast(message, type = 'info') { /* ... same as previous ... */ }
+
+    // --- Update KPI Cards ---
+    function updateKpiCards(requestsToCount = allClientRequests) {
+        $('#countTotal').text(requestsToCount.length);
+        $('#countPending').text(requestsToCount.filter(r => r.status === 'pending').length);
+        $('#countApproved').text(requestsToCount.filter(r => r.status === 'approved').length);
+        $('#countInProgress').text(requestsToCount.filter(r => r.status === 'in-progress').length);
+        $('#countCompleted').text(requestsToCount.filter(r => r.status === 'completed').length);
+        $('#countRejected').text(requestsToCount.filter(r => r.status === 'rejected').length);
+    }
+
+    // --- Initialize DataTable ---
+    function initializeTable(data) {
+        if ($.fn.DataTable.isDataTable('#requestHistoryTable')) {
+            requestHistoryTable.clear().rows.add(data).draw();
+            return;
+        }
+        requestHistoryTable = $('#requestHistoryTable').DataTable({
+            data: data,
+            columns: [
+                { data: 'id', className: 'font-medium' },
+                { data: 'vehicleName' },
+                { data: 'vehicleCode' },
+                { data: 'type' },
+                { data: 'date', render: formatDate },
+                { data: 'status', render: getStatusBadge },
+                { data: 'representative', defaultContent: '<em class="text-muted">N/A</em>' },
+                { 
+                    data: null,
+                    orderable: false,
+                    className: 'action-buttons text-center',
+                    render: function(data, type, row) {
+                        return `
+                            <button class="btn btn-icon btn-view" title="View Details" data-id="${row.id}"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-icon btn-download-pdf" title="Download PDF" data-id="${row.id}"><i class="fas fa-file-pdf"></i></button>
+                        `;
+                    }
+                }
+            ],
+            responsive: true,
+            language: {
+                search: "_INPUT_", searchPlaceholder: "Search in table...",
+                lengthMenu: "Show _MENU_", info: "Showing _START_ to _END_ of _TOTAL_ requests",
+                paginate: { previous: "<i class='fas fa-chevron-left'></i>", next: "<i class='fas fa-chevron-right'></i>" }
+            },
+            dom: 'rt<"bottom-controls"<"info-wrapper"li><"table-pagination"p>>', // Table, Info, Length, Pagination
+            pageLength: 10,
+            order: [[4, 'desc']] // Default sort by date descending
+        });
+    }
+
+    // --- Filtering Logic ---
+    function applyFilters() {
+        const searchTerm = $('#globalSearchRequests').val().toLowerCase();
+        const statusFilter = $('#statusFilterTable').val();
+        const startDate = $('#dateFilterStart').val();
+        const endDate = $('#dateFilterEnd').val();
+
+        let filteredData = allClientRequests.filter(req => {
+            const searchMatch = !searchTerm || 
+                req.id.toLowerCase().includes(searchTerm) ||
+                req.vehicleName.toLowerCase().includes(searchTerm) ||
+                req.vehicleCode.toLowerCase().includes(searchTerm);
+            
+            const statusMatch = !statusFilter || req.status === statusFilter;
+
+            let dateMatch = true;
+            if (startDate && endDate) {
+                const reqDate = new Date(req.date);
+                // Ensure time part is ignored for comparison if only date is provided
+                const filterStartDate = new Date(startDate); filterStartDate.setHours(0,0,0,0);
+                const filterEndDate = new Date(endDate); filterEndDate.setHours(23,59,59,999);
+                dateMatch = reqDate >= filterStartDate && reqDate <= filterEndDate;
+            } else if (startDate) {
+                 const filterStartDate = new Date(startDate); filterStartDate.setHours(0,0,0,0);
+                 dateMatch = new Date(req.date) >= filterStartDate;
+            } else if (endDate) {
+                 const filterEndDate = new Date(endDate); filterEndDate.setHours(23,59,59,999);
+                 dateMatch = new Date(req.date) <= filterEndDate;
+            }
+            return searchMatch && statusMatch && dateMatch;
+        });
+        initializeTable(filteredData); // Re-initialize or update table data
+        updateKpiCards(filteredData); // Update KPIs with filtered data counts
+    }
+
+    $('#globalSearchRequests, #statusFilterTable, #dateFilterStart, #dateFilterEnd').on('keyup change', applyFilters);
+    
+    $('#clearDateFiltersBtn').on('click', function() {
+        $('#dateFilterStart').val('');
+        $('#dateFilterEnd').val('');
+        applyFilters(); // Re-apply filters which will now ignore dates
+    });
+
+    // KPI Card click to filter table
+    $('.request-history-kpis .kpi-card').on('click', function() {
+        const status = $(this).data('status-filter');
+        $('.request-history-kpis .kpi-card').removeClass('active-filter');
+        $(this).addClass('active-filter');
+        
+        $('#statusFilterTable').val(status === 'all' ? '' : status).trigger('change');
+        // If 'all' is clicked on KPI, it clears the status filter dropdown and applies.
+    });
+
+
+    // --- Modal Logic ---
+    const $modal = $('#requestDetailModal');
+    $('#requestHistoryTable tbody').on('click', '.btn-view', function() {
+        const requestId = $(this).data('id');
+        const request = allClientRequests.find(r => r.id === requestId);
+        if (request) {
+            populateModal(request);
+            $modal.addClass('show');
+        }
+    });
+
+    $('#closeModalBtn, #modalCloseFooterBtn').on('click', () => $modal.removeClass('show'));
+    $modal.on('click', function(event) { if (event.target === this) $modal.removeClass('show'); });
+    $(document).on('keyup', function(e) { if (e.key === "Escape") $modal.removeClass('show'); });
+
+    function populateModal(req) {
+        $('#modalRequestId').text(req.id);
+        
+        // Build Timeline Stepper
+        const $timeline = $('<ul class="timeline-stepper"></ul>');
+        const steps = [
+            { label: 'Submitted by You', timestamp: req.date, details: req.description, status: 'completed' },
+            { label: 'Admin Review', timestamp: req.status === 'pending' ? 'Pending' : (req.status === 'rejected' ? formatDate(req.date) : formatDate(req.date)), details: req.status === 'rejected' ? `Reason: ${req.rejectionReason || 'Not specified'}` : (req.status !== 'pending' ? 'Reviewed' : 'Awaiting review'), status: req.status === 'pending' ? 'active' : (req.status === 'rejected' ? 'rejected' : 'completed') },
+            { label: 'Assigned to Representative', timestamp: req.representative ? formatDate(req.date) : 'Pending', details: req.representative || 'Not yet assigned', status: req.representative ? 'completed' : (req.status === 'approved' ? 'active' : '') },
+            { label: 'Service In Progress', timestamp: req.status === 'in-progress' ? formatDate(req.date) : 'Pending', details: 'Maintenance work is underway', status: req.status === 'in-progress' ? 'active' : (req.status === 'completed' ? 'completed' : '') },
+            { label: 'Service Completed', timestamp: req.status === 'completed' ? formatDate(req.date) : 'Pending', details: 'All work finished and verified.', status: req.status === 'completed' ? 'completed' : '' }
+        ];
+
+        steps.forEach((step, index) => {
+            let markerIcon = `<i class="fas fa-ellipsis-h"></i>`; // Default for future
+            if (step.status === 'completed') markerIcon = `<i class="fas fa-check"></i>`;
+            else if (step.status === 'active') markerIcon = `<i class="fas fa-spinner fa-spin"></i>`;
+            else if (step.status === 'rejected') markerIcon = `<i class="fas fa-times"></i>`;
+
+            $timeline.append(`
+                <li class="timeline-step ${step.status}">
+                    <div class="timeline-marker">${markerIcon}</div>
+                    <div class="timeline-content">
+                        <strong>${step.label}</strong>
+                        <span class="timestamp">${step.timestamp}</span>
+                        ${step.details ? `<p>${step.details}</p>` : ''}
+                    </div>
+                </li>
+            `);
+        });
+
+        const partsListHtml = req.parts && req.parts.length > 0 
+            ? `<ul>${req.parts.map(p => `<li>${p}</li>`).join('')}</ul>` 
+            : '<em>No specific parts listed.</em>';
+
+        const modalContentHtml = `
+            <div class="modal-request-details">
+                <div class="detail-group">
+                    <h5><i class="fas fa-car mr-2"></i>Vehicle & Service</h5>
+                    <div class="detail-item"><span class="label">Vehicle:</span> <span class="value">${req.vehicleName} (${req.vehicleCode})</span></div>
+                    <div class="detail-item"><span class="label">Service Type:</span> <span class="value">${req.type}</span></div>
+                    <div class="detail-item"><span class="label">Submitted:</span> <span class="value">${formatDate(req.date)}</span></div>
+                    <div class="detail-item"><span class="label">Status:</span> <span class="value">${getStatusBadge(req.status)}</span></div>
+                    <div class="detail-item"><span class="label">Preferred:</span> <span class="value">${req.preferredDate ? formatDate(req.preferredDate) : 'N/A'} ${req.preferredTime || ''}</span></div>
+                    <div class="detail-item"><span class="label">Location:</span> <span class="value">${req.location || 'N/A'}</span></div>
+                </div>
+                <div class="detail-group">
+                    <h5><i class="fas fa-user-cog mr-2"></i>Assignment & Parts</h5>
+                    <div class="detail-item"><span class="label">Representative:</span> <span class="value">${req.representative || '<em class="text-muted">Not Assigned Yet</em>'}</span></div>
+                    <div class="detail-item"><span class="label">Requested Parts/Services:</span> <span class="value">${partsListHtml}</span></div>
+                </div>
+                <div class="detail-group">
+                    <h5><i class="fas fa-sticky-note mr-2"></i>Description & Notes</h5>
+                    <div class="detail-item full-width"><span class="label">Description:</span> <p class="value">${req.description}</p></div>
+                    ${req.notes ? `<div class="detail-item full-width"><span class="label">Additional Notes:</span> <p class="value">${req.notes}</p></div>` : ''}
+                    ${req.status === 'rejected' && req.rejectionReason ? `<div class="detail-item full-width rejection-note"><span class="label">Rejection Reason:</span> <p class="value">${req.rejectionReason}</p></div>` : ''}
+                </div>
+                 <div class="detail-group">
+                    <h5><i class="fas fa-history mr-2"></i>Progress Timeline</h5>
+                    <div id="modalTimelineContainer"></div> <!-- Timeline will be injected here -->
+                </div>
+            </div>
+        `;
+        $('#modalBodyContent').html(modalContentHtml);
+        $('#modalTimelineContainer').append($timeline); // Inject the built timeline
+
+        // Update PDF download button in modal
+        $('#modalDownloadPdfBtn').data('id', req.id);
+    }
+    
+    // PDF Download (Placeholder)
+    $('#requestHistoryTable tbody, #modalDownloadPdfBtn').on('click', '.btn-download-pdf, #modalDownloadPdfBtn', function() {
+        const requestId = $(this).data('id');
+        showToast(`Simulating PDF download for ${requestId}...`, 'info');
+        // In a real app: window.open(`/api/client/requests/${requestId}/pdf`, '_blank');
+    });
+
+
+    // --- Initial Load ---
+    updateKpiCards(); // Initial KPI update with all data
+    initializeTable(allClientRequests); // Initial table load with all data
+    // Set default date filter to current month for example
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+    // $('#dateFilterStart').val(firstDay); // Optional: Default filter by current month
+    // $('#dateFilterEnd').val(lastDay);
+    // applyFilters(); // Apply default filters if any
+
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar-client');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        $('.dashboard-container').toggleClass('sidebar-collapsed-client');
+    });
+     $(document).on('click', function(event) {
+        if ($(window).width() < 992 && $sidebar.hasClass('open') && !$(event.target).closest('.sidebar-client').length && !$(event.target).closest('#sidebarToggle').length) {
+            $sidebar.removeClass('open');
+             $('.dashboard-container').removeClass('sidebar-collapsed-client');
+        }
+    });
+});
+    </script>
+</body>
+</html>

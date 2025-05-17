@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Representatives Management | Admin Dashboard</title>
+      <!-- Font Awesome for Icons -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+      <!-- DataTables CSS -->
+      <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li class="active"><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Representatives</h1>
+                <p class="subheader">Manage field representatives and their assignments.</p>
+            </header>
+
+            <!-- Representatives Table Section -->
+            <section class="table-section card">
+                <div class="card-header">
+                    <h2>Representatives List</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="globalSearch" placeholder="Search representatives..." class="form-control">
+                        </div>
+                        <select id="statusFilterTable" class="form-control" style="min-width: 150px;">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="on-leave">On Leave</option>
+                        </select>
+                        <select id="regionFilterTable" class="form-control" style="min-width: 150px;">
+                            <option value="">All Regions</option>
+                            <!-- Regions populated by JS -->
+                        </select>
+                        <button class="btn btn-primary" id="addRepresentativeBtn">
+                            <i class="fas fa-plus"></i> Add Representative
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="representativesTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Region</th>
+                                    <th>Status</th>
+                                    <th>Active Tasks</th>
+                                    <th>Completed Tasks</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Region Assignment/Overview Section -->
+            <section class="region-overview-section card">
+                <div class="card-header">
+                    <h2>Region Overview & Quick Add</h2>
+                </div>
+                <div class="card-body">
+                    <div class="region-cards-container" id="regionCardsContainer">
+                        <!-- Region cards will be populated by JS -->
+                        <div class="region-card-placeholder">
+                            <p>Loading region data...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Add/Edit Representative Modal -->
+    <div id="repModal" class="modal">
+        <div class="modal-content modal-lg"> <!-- Larger modal for more fields -->
+            <div class="modal-header">
+                <h4 id="repModalTitle">Add New Representative</h4>
+                <button class="close-btn" id="closeRepModalBtn">×</button>
+            </div>
+            <form id="repForm">
+                <div class="modal-body">
+                    <input type="hidden" id="repId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="repName">Full Name <span class="required-asterisk">*</span></label>
+                            <input type="text" id="repName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repEmail">Email <span class="required-asterisk">*</span></label>
+                            <input type="email" id="repEmail" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repPhone">Phone <span class="required-asterisk">*</span></label>
+                            <input type="tel" id="repPhone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="repRegion">Region <span class="required-asterisk">*</span></label>
+                            <select id="repRegion" class="form-control" required>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="repStatus">Status <span class="required-asterisk">*</span></label>
+                            <select id="repStatus" class="form-control" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="on-leave">On Leave</option>
+                            </select>
+                        </div>
+                         <div class="form-group">
+                            <label for="repAvatar">Avatar URL (Optional)</label>
+                            <input type="url" id="repAvatar" class="form-control" placeholder="https://example.com/avatar.jpg">
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="repAddress">Address</label>
+                            <textarea id="repAddress" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="repSkills">Skills (comma-separated)</label>
+                            <input type="text" id="repSkills" class="form-control" placeholder="e.g., Electrical, Plumbing, HVAC">
+                        </div>
+                         <div class="form-group form-group-full">
+                            <label for="repNotes">Notes</label>
+                            <textarea id="repNotes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelRepBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveRepBtn">Save Representative</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Representative Details Modal -->
+    <div id="viewRepModal" class="modal">
+        <div class="modal-content modal-xl"> <!-- Even larger for detailed view -->
+            <div class="modal-header">
+                <h4 id="viewRepModalTitle">Representative Details</h4>
+                <button class="close-btn" id="closeViewRepModalBtn">×</button>
+            </div>
+            <div class="modal-body" id="viewRepModalBody">
+                <!-- Content populated by JS -->
+                <p>Loading details...</p>
+            </div>
+            <div class="modal-footer">
+                 <button type="button" class="btn btn-outline" id="editFromViewBtn">
+                    <i class="fas fa-edit"></i> Edit Representative
+                </button>
+                <button type="button" class="btn btn-secondary" id="closeViewRepModalFooterBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="representatives_script.js"></script> <!-- Specific JS for this page -->
+    <script>
+        $(document).ready(function() {
+    // --- Mock Data & State ---
+    let representativesData = [
+        { id: 1, name: 'James Wilson', avatar: null, email: 'james@mainflow.com', phone: '+15551237890', region: 'Northern Region', status: 'active', assignedRequests: 5, completedRequests: 120, address: '101 North Pole Ave', skills: ['HVAC', 'Electrical'], notes: 'Senior technician.' },
+        { id: 2, name: 'Maria Rodriguez', avatar: 'https://randomuser.me/api/portraits/women/44.jpg', email: 'maria@mainflow.com', phone: '+15552345678', region: 'Southern Region', status: 'active', assignedRequests: 3, completedRequests: 87, address: '202 South Beach Rd', skills: ['Plumbing', 'Diagnostics'], notes: '' },
+        { id: 3, name: 'Samuel Johnson', avatar: null, email: 'samuel@mainflow.com', phone: '+15553456789', region: 'Eastern Region', status: 'inactive', assignedRequests: 0, completedRequests: 54, address: '303 East Bay St', skills: ['Mechanical'], notes: 'Recently inactive.' },
+        { id: 4, name: 'Lisa Chen', avatar: 'https://randomuser.me/api/portraits/women/68.jpg', email: 'lisa@mainflow.com', phone: '+15554567890', region: 'Western Region', status: 'active', assignedRequests: 7, completedRequests: 92, address: '404 West Valley Pk', skills: ['Appliance Repair', 'Customer Service'], notes: 'High satisfaction rate.' },
+        { id: 5, name: 'David Kim', avatar: 'https://randomuser.me/api/portraits/men/32.jpg', email: 'david@mainflow.com', phone: '+15555678901', region: 'Central Region', status: 'on-leave', assignedRequests: 1, completedRequests: 76, address: '505 Central Plaza', skills: ['Painting', 'Carpentry'], notes: 'Expected back next month.' },
+    ];
+
+    const allRegions = ['Northern Region', 'Southern Region', 'Eastern Region', 'Western Region', 'Central Region', 'Midwest Region']; // Add more if needed
+
+    // --- Initialize DataTable ---
+    const repsTable = $('#representativesTable').DataTable({
+        data: representativesData,
+        responsive: true,
+        columns: [
+            { data: 'id', className: 'text-center' },
+            { 
+                data: 'name',
+                render: function(data, type, row) {
+                    const avatarContent = row.avatar ? `<img src="${row.avatar}" alt="${data}" class="table-avatar">`
+                                          : `<span class="table-avatar">${data.charAt(0)}</span>`;
+                    return `<div class="table-rep-name">${avatarContent}${data}</div>`;
+                }
+            },
+            { data: 'email' },
+            { 
+                data: 'phone',
+                render: function(data) {
+                    return data ? formatPhoneNumber(data) : 'N/A';
+                }
+            },
+            { data: 'region' },
+            { 
+                data: 'status',
+                render: function(data) {
+                    let badgeClass = '';
+                    if (data === 'active') badgeClass = 'badge-success';
+                    else if (data === 'inactive') badgeClass = 'badge-secondary'; // Use a gray-ish badge
+                    else if (data === 'on-leave') badgeClass = 'badge-warning';
+                    const statusText = data.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return `<span class="badge ${badgeClass}">${statusText}</span>`;
+                }
+            },
+            { data: 'assignedRequests', className: 'text-center' },
+            { data: 'completedRequests', className: 'text-center' },
+            { 
+                data: null,
+                orderable: false,
+                className: 'action-buttons text-center',
+                render: function(data, type, row) {
+                    return `
+                        <button class="btn btn-icon btn-view" title="View" data-id="${row.id}"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-icon btn-edit" title="Edit" data-id="${row.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-icon btn-delete" title="Delete" data-id="${row.id}"><i class="fas fa-trash-alt"></i></button>
+                    `;
+                }
+            }
+        ],
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search in table...",
+            lengthMenu: "Show _MENU_",
+            info: "Showing _START_ to _END_ of _TOTAL_ reps",
+            paginate: { previous: "<i class='fas fa-chevron-left'></i>", next: "<i class='fas fa-chevron-right'></i>" }
+        },
+        dom: 'rt<"bottom-controls"<"info-wrapper"li>p>',
+        pageLength: 7,
+        lengthMenu: [ [7, 10, 25, -1], [7, 10, 25, "All"] ]
+    });
+
+    // --- Helper Functions ---
+    function formatPhoneNumber(phoneNumberString) {
+        const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{1})(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
+        }
+        return phoneNumberString;
+    }
+
+    function populateDropdown(selector, optionsArray, addAllOption = true, allOptionText = "All Regions") {
+        const $select = $(selector);
+        $select.empty();
+        if (addAllOption) {
+            $select.append(`<option value="">${allOptionText}</option>`);
+        }
+        optionsArray.forEach(option => {
+            $select.append(`<option value="${option}">${option}</option>`);
+        });
+    }
+
+    function showToast(message, type = 'info') {
+        const $toast = $('#toastNotification');
+        const $toastMessage = $('#toastMessage');
+        $toastMessage.text(message);
+        $toast.removeClass('success error info').addClass(type).addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3000);
+    }
+
+    // --- Populate Filters and Region Selects ---
+    populateDropdown('#regionFilterTable', allRegions);
+    populateDropdown('#repRegion', allRegions, false); // No "All" for add/edit form
+
+    // --- Region Overview Cards ---
+    function renderRegionCards() {
+        const $container = $('#regionCardsContainer');
+        $container.empty();
+        if (allRegions.length === 0) {
+            $container.html('<p class="text-muted">No regions defined.</p>');
+            return;
+        }
+
+        allRegions.forEach(region => {
+            const repsInRegion = representativesData.filter(r => r.region === region);
+            const activeRepsInRegion = repsInRegion.filter(r => r.status === 'active');
+            
+            let repListHtml = repsInRegion.length > 0 
+                ? repsInRegion.slice(0, 5).map(rep => `<li><span class="rep-status-dot ${rep.status}"></span>${rep.name} <small class="text-muted">(${rep.status})</small></li>`).join('')
+                : '<li class="no-reps">No representatives assigned.</li>';
+            if (repsInRegion.length > 5) repListHtml += '<li>... and more</li>';
+
+            const cardHtml = `
+                <div class="region-card">
+                    <div class="region-card-header">
+                        <h4><i class="fas fa-map-marker-alt"></i> ${region}</h4>
+                        <span class="region-card-rep-count">${activeRepsInRegion.length} Active</span>
+                    </div>
+                    <div class="region-card-body">
+                        <ul>${repListHtml}</ul>
+                        <button class="btn btn-sm btn-outline add-to-region-btn" data-region="${region}">
+                            <i class="fas fa-plus"></i> Add Rep to ${region}
+                        </button>
+                    </div>
+                </div>
+            `;
+            $container.append(cardHtml);
+        });
+    }
+    renderRegionCards();
+
+    // --- Event Handlers ---
+    // Global search
+    $('#globalSearch').on('keyup', function() {
+        repsTable.search(this.value).draw();
+    });
+
+    // Table column filters
+    $('#statusFilterTable').on('change', function() {
+        repsTable.column(5).search(this.value).draw(); // Status is 6th col (index 5)
+    });
+    $('#regionFilterTable').on('change', function() {
+        repsTable.column(4).search(this.value).draw(); // Region is 5th col (index 4)
+    });
+
+    // Add Representative Button (Main)
+    $('#addRepresentativeBtn').on('click', function() {
+        $('#repModalTitle').text('Add New Representative');
+        $('#repForm')[0].reset();
+        $('#repId').val(''); // Ensure no ID for new rep
+        $('#repModal').addClass('show');
+    });
+    
+    // Add Representative to specific region (from card)
+    $('#regionCardsContainer').on('click', '.add-to-region-btn', function() {
+        const region = $(this).data('region');
+        $('#repModalTitle').text(`Add New Representative to ${region}`);
+        $('#repForm')[0].reset();
+        $('#repId').val('');
+        $('#repRegion').val(region); // Pre-select region
+        $('#repModal').addClass('show');
+    });
+
+    // Modal Close Buttons
+    $('#closeRepModalBtn, #cancelRepBtn').on('click', function() {
+        $('#repModal').removeClass('show');
+    });
+
+    // Submit Add/Edit Representative Form
+    $('#repForm').on('submit', function(e) {
+        e.preventDefault();
+        const repId = $('#repId').val();
+        const formData = {
+            id: repId ? parseInt(repId) : Date.now(), // Use timestamp for new ID or parse existing
+            name: $('#repName').val(),
+            avatar: $('#repAvatar').val() || null,
+            email: $('#repEmail').val(),
+            phone: $('#repPhone').val(),
+            region: $('#repRegion').val(),
+            status: $('#repStatus').val(),
+            address: $('#repAddress').val(),
+            skills: $('#repSkills').val().split(',').map(s => s.trim()).filter(s => s),
+            notes: $('#repNotes').val(),
+            // Keep existing counts if editing, or default to 0 for new
+            assignedRequests: repId ? representativesData.find(r=>r.id===parseInt(repId)).assignedRequests : 0,
+            completedRequests: repId ? representativesData.find(r=>r.id===parseInt(repId)).completedRequests : 0,
+        };
+
+        if (repId) { // Editing
+            const index = representativesData.findIndex(r => r.id === parseInt(repId));
+            if (index > -1) {
+                representativesData[index] = { ...representativesData[index], ...formData }; // Merge to keep stats
+            }
+        } else { // Adding
+            representativesData.push(formData);
+        }
+        
+        repsTable.clear().rows.add(representativesData).draw();
+        renderRegionCards(); // Update region cards
+        $('#repModal').removeClass('show');
+        showToast(`Representative ${repId ? 'updated' : 'added'} successfully!`, 'success');
+    });
+
+    // Table Action Buttons (Edit, Delete, View) - Event Delegation
+    $('#representativesTable tbody').on('click', 'button', function() {
+        const repId = $(this).data('id');
+        const representative = representativesData.find(r => r.id === repId);
+
+        if ($(this).hasClass('btn-edit')) {
+            $('#repModalTitle').text('Edit Representative');
+            $('#repId').val(representative.id);
+            $('#repName').val(representative.name);
+            $('#repAvatar').val(representative.avatar);
+            $('#repEmail').val(representative.email);
+            $('#repPhone').val(representative.phone);
+            $('#repRegion').val(representative.region);
+            $('#repStatus').val(representative.status);
+            $('#repAddress').val(representative.address);
+            $('#repSkills').val(representative.skills ? representative.skills.join(', ') : '');
+            $('#repNotes').val(representative.notes);
+            $('#repModal').addClass('show');
+        } 
+        else if ($(this).hasClass('btn-delete')) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete ${representative.name}? This cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    representativesData = representativesData.filter(r => r.id !== repId);
+                    repsTable.clear().rows.add(representativesData).draw();
+                    renderRegionCards();
+                    Swal.fire('Deleted!', `${representative.name} has been deleted.`, 'success');
+                }
+            });
+        }
+        else if ($(this).hasClass('btn-view')) {
+            populateViewModal(representative);
+            $('#viewRepModal').addClass('show');
+        }
+    });
+
+    // --- View Modal Logic ---
+    function populateViewModal(rep) {
+        $('#viewRepModalTitle').text(`Details for ${rep.name}`);
+        const avatarContent = rep.avatar 
+            ? `<img src="${rep.avatar}" alt="${rep.name}" class="view-rep-avatar">`
+            : `<div class="view-rep-avatar">${rep.name.charAt(0)}</div>`;
+
+        let statusBadgeClass = '';
+        if (rep.status === 'active') statusBadgeClass = 'badge-success';
+        else if (rep.status === 'inactive') statusBadgeClass = 'badge-secondary';
+        else if (rep.status === 'on-leave') statusBadgeClass = 'badge-warning';
+        const statusText = rep.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+        const skillsHtml = rep.skills && rep.skills.length > 0
+            ? rep.skills.map(skill => `<span>${skill}</span>`).join('')
+            : '<span class="text-muted">No skills listed</span>';
+        
+        const modalBodyHtml = `
+            <div class="view-rep-header">
+                ${avatarContent}
+                <div class="view-rep-info">
+                    <h3>${rep.name}</h3>
+                    <p><i class="fas fa-envelope mr-2 text-muted"></i>${rep.email}</p>
+                    <p><i class="fas fa-phone mr-2 text-muted"></i>${formatPhoneNumber(rep.phone)}</p>
+                    <p><i class="fas fa-map-marker-alt mr-2 text-muted"></i>${rep.region}</p>
+                    <span class="badge ${statusBadgeClass}">${statusText}</span>
+                </div>
+            </div>
+            <div class="view-rep-grid">
+                <div class="view-rep-section">
+                    <h5>Details</h5>
+                    <div class="view-rep-item"><span class="label">Address:</span> <span class="value">${rep.address || 'N/A'}</span></div>
+                    <div class="view-rep-item"><span class="label">Active Tasks:</span> <span class="value">${rep.assignedRequests}</span></div>
+                    <div class="view-rep-item"><span class="label">Completed Tasks:</span> <span class="value">${rep.completedRequests}</span></div>
+                </div>
+                <div class="view-rep-section">
+                    <h5>Skills</h5>
+                    <div class="view-rep-item"><div class="value skills-list">${skillsHtml}</div></div>
+                </div>
+                <div class="view-rep-section" style="grid-column: 1 / -1;">
+                    <h5>Notes</h5>
+                    <div class="view-rep-item"><span class="value">${rep.notes || '<span class="text-muted">No notes available.</span>'}</span></div>
+                </div>
+            </div>
+        `;
+        $('#viewRepModalBody').html(modalBodyHtml);
+        $('#editFromViewBtn').data('id', rep.id); // Store ID for edit button
+    }
+
+    $('#closeViewRepModalBtn, #closeViewRepModalFooterBtn').on('click', function() {
+        $('#viewRepModal').removeClass('show');
+    });
+
+    $('#editFromViewBtn').on('click', function() {
+        const repId = $(this).data('id');
+        const representative = representativesData.find(r => r.id === repId);
+        if (representative) {
+            $('#viewRepModal').removeClass('show'); // Close view modal
+            // Trigger edit
+            $('#representativesTable tbody button.btn-edit[data-id="'+repId+'"]').click();
+        }
+    });
+    
+    // Close modals on Escape key or backdrop click
+    $(document).on('keyup', function(e) {
+        if (e.key === "Escape") {
+            $('.modal.show').removeClass('show');
+        }
+    });
+    $('.modal').on('click', function(event) {
+        if (event.target === this) {
+            $(this).removeClass('show');
+        }
+    });
+
+    // Sidebar Toggle (same as requests page)
+    const $sidebar = $('.sidebar');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+    });
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992) {
+            if ($sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+            }
+        }
+    });
+
+});
+    </script>
+</body>
+</html>

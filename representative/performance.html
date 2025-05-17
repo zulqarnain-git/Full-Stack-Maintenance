@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Work Reports - MaintSys Rep</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/representative.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="assigned.html"><i class="fas fa-tasks"></i> Assigned Request <span class="badge" id="assignedTasksCountBadge">0</span></a></li>
+                    <li><a href="completed.html"><i class="fas fa-check-circle"></i> Completed Tasks</a></li>
+                    <li><a href="services.html"><i class="fas fa-tools"></i> Parts & Services Log</a></li>
+                    <li class="active"><a href="performance.html"><i class="fas fa-chart-line"></i> My Performance</a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Representative User</span>
+                        <span class="user-role">Provider</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Work Reports <span id="repWelcomeName"></span></h1>
+                    <p class="subheader">View and analyze your performance and work history</p>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </div>
+                     <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </header>
+
+            <main class="page-content">
+                <div class="page-header">
+                    <div class="header-actions">
+                        <div class="date-range-filter">
+                            <input type="date" id="startDate" value="2024-01-01" class="form-control">
+                            <span>to</span>
+                            <input type="date" id="endDate" value="2024-07-31" class="form-control">
+                        </div>
+                        <button class="btn btn-outline" id="exportPdfBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Export PDF</button>
+                        <button class="btn btn-outline" id="exportCsvBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Export CSV</button>
+                        <button class="btn btn-primary" id="printReportBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print Report</button>
+                    </div>
+                </div>
+
+                <!-- Summary Metrics -->
+                <section class="summary-metrics widget-grid">
+                    <div class="widget card">
+                        <div class="widget-icon" style="background-color: #e6f7ff; color: #1890ff;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        </div>
+                        <div class="widget-content">
+                            <h4>Completed Requests</h4>
+                            <p class="widget-value" id="metricTotalRequests">0</p>
+                            <span class="widget-description">Current period</span>
+                        </div>
+                    </div>
+                    <div class="widget card">
+                        <div class="widget-icon" style="background-color: #f6ffed; color: #52c41a;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div class="widget-content">
+                            <h4>Total Hours Logged</h4>
+                            <p class="widget-value" id="metricTotalHours">0.0</p>
+                            <span class="widget-description">Worked hours</span>
+                        </div>
+                    </div>
+                    <div class="widget card">
+                        <div class="widget-icon" style="background-color: #fffbe6; color: #faad14;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
+                        <div class="widget-content">
+                            <h4>On-Time Completion</h4>
+                            <p class="widget-value" id="metricOnTimeRate">0%</p>
+                            <span class="widget-description">Requests on schedule</span>
+                        </div>
+                    </div>
+                    <div class="widget card">
+                        <div class="widget-icon" style="background-color: #fff0f6; color: #eb2f96;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245 1.179-6.873-4.993-4.867 6.9-1.002L12 2l3.086 6.253 6.9 1.002-4.993 4.867 1.179 6.873z"/></svg>
+                        </div>
+                        <div class="widget-content">
+                            <h4>Average Rating</h4>
+                            <p class="widget-value" id="metricAvgRating">0.0/5</p>
+                            <span class="widget-description">Client satisfaction</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tabs -->
+                <section class="tabs-section">
+                    <div class="tab-navigation">
+                        <button class="tab-link active" data-tab="performance">Performance</button>
+                        <button class="tab-link" data-tab="requestHistory">Request History</button>
+                        <button class="tab-link" data-tab="hoursUtilization">Hours & Utilization</button>
+                        <button class="tab-link" data-tab="clientFeedback">Client Feedback</button>
+                    </div>
+
+                    <div class="tab-content active" id="performanceContent">
+                        <h3>Performance Overview</h3>
+                        <div class="grid-layout grid-cols-2">
+                            <div class="card chart-container">
+                                <h4>Weekly Performance</h4>
+                                <canvas id="weeklyPerformanceChart"></canvas>
+                            </div>
+                            <div class="card chart-container">
+                                <h4>Service Types Breakdown</h4>
+                                <canvas id="serviceTypesChart"></canvas>
+                            </div>
+                            <div class="card chart-container full-width">
+                                <h4>Client Satisfaction Trend</h4>
+                                <canvas id="satisfactionTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="requestHistoryContent">
+                        <h3>Request History</h3>
+                        <div class="card">
+                            <h4>Recent Service Requests</h4>
+                            <div class="table-responsive">
+                                <table class="data-table" id="requestsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Request ID</th>
+                                            <th>Client</th>
+                                            <th>Vehicle</th>
+                                            <th>Service Type</th>
+                                            <th>Date</th>
+                                            <th>Hours</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Rows will be injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="grid-layout grid-cols-2">
+                            <div class="card">
+                                <h4>Avg. Completion Time by Type</h4>
+                                <div id="completionTimeBars">
+                                    <!-- Progress bars injected by JS -->
+                                </div>
+                            </div>
+                            <div class="card">
+                                <h4>Request Locations (Placeholder)</h4>
+                                <div class="map-placeholder">
+                                    <p>Map visualization of service locations would appear here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="hoursUtilizationContent">
+                        <h3>Hours & Utilization</h3>
+                        <div class="grid-layout grid-cols-2">
+                            <div class="card chart-container">
+                                <h4>Daily Hours Logged</h4>
+                                <canvas id="dailyHoursChart"></canvas>
+                            </div>
+                            <div class="card">
+                                <h4>Time Utilization</h4>
+                                <div id="timeUtilizationDisplay">
+                                     <!-- Progress bars or pie chart by JS -->
+                                </div>
+                                <div class="card summary-box" style="margin-top: 20px;">
+                                    <h4>Weekly Summary</h4>
+                                    <ul id="weeklyHoursSummary">
+                                        <li>Total Hours: <span id="summaryTotalHours">0</span></li>
+                                        <li>Average Daily: <span id="summaryAvgDaily">0</span></li>
+                                        <li>Overtime: <span id="summaryOvertime">0</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="clientFeedbackContent">
+                        <h3>Client Feedback</h3>
+                        <div class="grid-layout grid-cols-2">
+                            <div class="card">
+                                <h4>Recent Feedback</h4>
+                                <ul class="feedback-list" id="feedbackList">
+                                    <!-- Feedback items injected by JS -->
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <h4>Rating Distribution</h4>
+                                <div id="ratingDistributionBars">
+                                    <!-- Rating bars injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    // --- Mock Data (Inspired by Code 2) ---
+    const mockData = {
+        summary: {
+            totalRequests: 52,
+            totalHours: 175.5,
+            onTimeRate: 92, // percentage
+            avgRating: 4.6
+        },
+        weeklyPerformance: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            completed: [12, 15, 11, 14],
+            onTime: [10, 13, 9, 12]
+        },
+        serviceTypes: {
+            labels: ['Maintenance', 'Repair', 'Emergency', 'Inspection'],
+            data: [45, 30, 15, 10] // percentages or counts
+        },
+        satisfactionTrend: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            ratings: [4.5, 4.7, 4.2, 4.8]
+        },
+        requestHistory: [
+            { id: 'REQ-053', client: 'ABC Corp', vehicle: 'Toyota Hilux', type: 'Maintenance', date: '2024-07-25', hours: 3.5, status: 'completed' },
+            { id: 'REQ-049', client: 'XYZ Industries', vehicle: 'Ford Ranger', type: 'Repair', date: '2024-07-23', hours: 5.0, status: 'completed' },
+            { id: 'REQ-048', client: 'Tech Solutions', vehicle: 'Toyota LC', type: 'Emergency', date: '2024-07-22', hours: 2.5, status: 'completed' },
+            { id: 'REQ-045', client: 'Global Logistics', vehicle: 'Nissan Navara', type: 'Inspection', date: '2024-07-21', hours: 1.0, status: 'completed' },
+        ],
+        completionTimeByType: [
+            { type: 'Maintenance', avgHours: 3.2, maxHours: 5 },
+            { type: 'Repair', avgHours: 4.8, maxHours: 8 },
+            { type: 'Emergency', avgHours: 2.5, maxHours: 4 },
+            { type: 'Inspection', avgHours: 1.1, maxHours: 2 }
+        ],
+        dailyHours: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            hours: [8.0, 7.5, 9.0, 8.0, 7.0, 4.0, 0]
+        },
+        timeUtilization: [ // As percentages
+            { type: 'Service Time', value: 70, color: 'var(--primary-color)' },
+            { type: 'Travel Time', value: 20, color: 'var(--success-color)' },
+            { type: 'Admin', value: 10, color: 'var(--warning-color)' }
+        ],
+        weeklyHoursSummary: {
+            total: 43.5,
+            avgDaily: 6.2,
+            overtime: 3.5
+        },
+        clientFeedback: [
+            { client: 'ABC Corp', date: '2024-07-26', rating: 5, comment: 'Excellent service, very thorough.' },
+            { client: 'XYZ Industries', date: '2024-07-24', rating: 4, comment: 'Good work, completed on time.' },
+            { client: 'Tech Solutions', date: '2024-07-23', rating: 5, comment: 'Solved the issue quickly!' },
+            { client: 'New Client Co', date: '2024-07-20', rating: 3, comment: 'Took a bit longer than expected.' }
+        ],
+        ratingDistribution: [ // count for each star rating
+            { stars: 5, count: 25, color: 'var(--success-color)' },
+            { stars: 4, count: 15, color: 'var(--primary-color)' },
+            { stars: 3, count: 5, color: 'var(--warning-color)' },
+            { stars: 2, count: 1, color: 'var(--danger-color)' },
+            { stars: 1, count: 0, color: 'var(--secondary-color)' }
+        ]
+    };
+
+    // --- UI Element Selectors ---
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const mobileSidebarToggle = document.querySelector('.mobile-sidebar-toggle');
+    const userProfileButton = document.querySelector('.user-profile-button');
+    const dropdownMenu = document.querySelector('.user-profile-dropdown .dropdown-menu');
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // --- Event Listeners ---
+    sidebarToggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        // Adjust chart sizes if needed after sidebar transition
+        setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+    });
+
+    mobileSidebarToggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+    });
+    
+    // Close mobile sidebar when clicking outside
+    document.addEventListener('click', (event) => {
+        if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && !mobileSidebarToggle.contains(event.target)) {
+            sidebar.classList.remove('open');
+        }
+    });
+
+    userProfileButton?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+        if (dropdownMenu?.classList.contains('show')) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+
+    tabLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const tabId = link.dataset.tab;
+
+            tabLinks.forEach(l => l.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            link.classList.add('active');
+            document.getElementById(`${tabId}Content`).classList.add('active');
+            
+            // Re-initialize or update charts if they are in the newly active tab
+            // This is important if charts are not visible on initial load
+            if(tabId === 'performance') initPerformanceCharts();
+            if(tabId === 'hoursUtilization') initHoursUtilizationCharts();
+
+            // Trigger resize for charts to adapt if their container size changed
+             setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+        });
+    });
+
+    document.getElementById('printReportBtn')?.addEventListener('click', () => window.print());
+    document.getElementById('exportPdfBtn')?.addEventListener('click', () => alert('PDF Export (Placeholder)'));
+    document.getElementById('exportCsvBtn')?.addEventListener('click', () => alert('CSV Export (Placeholder)'));
+
+    // --- Chart.js Configurations ---
+    const defaultChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    };
+    
+    let weeklyPerformanceChartInstance, serviceTypesChartInstance, satisfactionTrendChartInstance, dailyHoursChartInstance;
+
+    // --- Data Population Functions ---
+    function populateSummaryMetrics() {
+        document.getElementById('metricTotalRequests').textContent = mockData.summary.totalRequests;
+        document.getElementById('metricTotalHours').textContent = mockData.summary.totalHours.toFixed(1);
+        document.getElementById('metricOnTimeRate').textContent = `${mockData.summary.onTimeRate}%`;
+        document.getElementById('metricAvgRating').textContent = `${mockData.summary.avgRating.toFixed(1)}/5`;
+    }
+
+    function initPerformanceCharts() {
+        const weeklyCtx = document.getElementById('weeklyPerformanceChart')?.getContext('2d');
+        if (weeklyCtx) {
+            if(weeklyPerformanceChartInstance) weeklyPerformanceChartInstance.destroy();
+            weeklyPerformanceChartInstance = new Chart(weeklyCtx, {
+                type: 'bar',
+                data: {
+                    labels: mockData.weeklyPerformance.labels,
+                    datasets: [
+                        { label: 'Completed', data: mockData.weeklyPerformance.completed, backgroundColor: 'rgba(0, 123, 255, 0.7)' },
+                        { label: 'On Time', data: mockData.weeklyPerformance.onTime, backgroundColor: 'rgba(40, 167, 69, 0.7)' }
+                    ]
+                },
+                options: defaultChartOptions
+            });
+        }
+
+        const serviceTypesCtx = document.getElementById('serviceTypesChart')?.getContext('2d');
+        if (serviceTypesCtx) {
+            if(serviceTypesChartInstance) serviceTypesChartInstance.destroy();
+            serviceTypesChartInstance = new Chart(serviceTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: mockData.serviceTypes.labels,
+                    datasets: [{
+                        data: mockData.serviceTypes.data,
+                        backgroundColor: ['#007bff', '#28a745', '#ffc107', '#6c757d']
+                    }]
+                },
+                options: { ...defaultChartOptions, plugins: { legend: { position: 'right'}}}
+            });
+        }
+
+        const satisfactionCtx = document.getElementById('satisfactionTrendChart')?.getContext('2d');
+        if (satisfactionCtx) {
+            if(satisfactionTrendChartInstance) satisfactionTrendChartInstance.destroy();
+            satisfactionTrendChartInstance = new Chart(satisfactionCtx, {
+                type: 'line',
+                data: {
+                    labels: mockData.satisfactionTrend.labels,
+                    datasets: [{
+                        label: 'Avg. Rating',
+                        data: mockData.satisfactionTrend.ratings,
+                        borderColor: '#eb2f96',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {...defaultChartOptions, scales: { y: { min: 0, max: 5 }}}
+            });
+        }
+    }
+    
+    function populateRequestHistoryTable() {
+        const tableBody = document.getElementById('requestsTable')?.querySelector('tbody');
+        if (!tableBody) return;
+        tableBody.innerHTML = ''; // Clear existing
+        mockData.requestHistory.forEach(req => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${req.id}</td>
+                <td>${req.client}</td>
+                <td>${req.vehicle}</td>
+                <td>${req.type}</td>
+                <td>${req.date}</td>
+                <td>${req.hours.toFixed(1)}</td>
+                <td><span class="status-badge status-${req.status}">${req.status}</span></td>
+            `;
+        });
+    }
+
+    function populateCompletionTimeBars() {
+        const container = document.getElementById('completionTimeBars');
+        if (!container) return;
+        container.innerHTML = '';
+        mockData.completionTimeByType.forEach(item => {
+            const percentage = (item.avgHours / item.maxHours) * 100;
+            container.innerHTML += `
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>${item.type}</span>
+                        <span>${item.avgHours.toFixed(1)} hrs</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${percentage}%; background-color: var(--primary-color);"></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    function initHoursUtilizationCharts() {
+        const dailyHoursCtx = document.getElementById('dailyHoursChart')?.getContext('2d');
+        if (dailyHoursCtx) {
+            if(dailyHoursChartInstance) dailyHoursChartInstance.destroy();
+            dailyHoursChartInstance = new Chart(dailyHoursCtx, {
+                type: 'bar',
+                data: {
+                    labels: mockData.dailyHours.labels,
+                    datasets: [{
+                        label: 'Hours Logged',
+                        data: mockData.dailyHours.hours,
+                        backgroundColor: 'rgba(0, 123, 255, 0.7)'
+                    }]
+                },
+                options: defaultChartOptions
+            });
+        }
+    }
+
+    function populateTimeUtilization() {
+        const container = document.getElementById('timeUtilizationDisplay');
+        if (!container) return;
+        container.innerHTML = '<h4>Utilization Breakdown</h4>';
+        mockData.timeUtilization.forEach(item => {
+            container.innerHTML += `
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>${item.type}</span>
+                        <span>${item.value}%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${item.value}%; background-color: ${item.color};"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('summaryTotalHours').textContent = mockData.weeklyHoursSummary.total.toFixed(1);
+        document.getElementById('summaryAvgDaily').textContent = mockData.weeklyHoursSummary.avgDaily.toFixed(1);
+        document.getElementById('summaryOvertime').textContent = mockData.weeklyHoursSummary.overtime.toFixed(1);
+    }
+
+    function populateClientFeedback() {
+        const list = document.getElementById('feedbackList');
+        if (!list) return;
+        list.innerHTML = '';
+        mockData.clientFeedback.forEach(fb => {
+            let starsHTML = '';
+            for (let i = 0; i < 5; i++) {
+                starsHTML += `<span>${i < fb.rating ? '★' : '☆'}</span>`;
+            }
+            list.innerHTML += `
+                <li>
+                    <div class="feedback-header">
+                        <span class="feedback-client">${fb.client}</span>
+                        <span class="feedback-date">${fb.date}</span>
+                    </div>
+                    <div class="feedback-rating">${starsHTML} (${fb.rating}/5)</div>
+                    <p class="feedback-comment">"${fb.comment}"</p>
+                </li>
+            `;
+        });
+    }
+
+    function populateRatingDistribution() {
+        const container = document.getElementById('ratingDistributionBars');
+        if (!container) return;
+        container.innerHTML = '';
+        const totalRatings = mockData.ratingDistribution.reduce((sum, item) => sum + item.count, 0);
+
+        mockData.ratingDistribution.forEach(item => {
+            const percentage = totalRatings > 0 ? (item.count / totalRatings) * 100 : 0;
+            let starsHTML = '';
+            for (let i = 0; i < 5; i++) {
+                starsHTML += `<span class="${i < item.stars ? '' : 'dim'}">★</span>`;
+            }
+            container.innerHTML += `
+                <div class="rating-bar-item">
+                    <div class="rating-label">
+                        <span class="rating-stars">${starsHTML} (${item.stars} stars)</span>
+                        <span>${item.count} (${percentage.toFixed(0)}%)</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${item.color};"></div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // --- Initial Page Load ---
+    function initializePage() {
+        populateSummaryMetrics();
+        initPerformanceCharts(); // Initialize charts in the default active tab
+        populateRequestHistoryTable();
+        populateCompletionTimeBars();
+        // initHoursUtilizationCharts(); // Only call when tab is active
+        populateTimeUtilization();
+        populateClientFeedback();
+        populateRatingDistribution();
+        
+        // Set default active tab if needed
+        document.querySelector('.tab-link[data-tab="performance"]').click();
+    }
+
+    initializePage();
+});
+    </script>
+</body>
+</html>

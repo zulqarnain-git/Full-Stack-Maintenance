@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Requests | Admin Dashboard</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Maint<span class="logo-alt">Sys</span></h2>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="contracts.html"><i class="fas fa-file-contract"></i> <span>Contracts</span></a></li>
+                    <li class="active"><a href="requests.html"><i class="fas fa-tools"></i> <span>Requests</span></a></li>
+                    <li><a href="clients.html"><i class="fas fa-users"></i> <span>Clients</span></a></li>
+                    <li><a href="representatives.html"><i class="fas fa-user-tie"></i> <span>Representatives</span></a></li>
+                    <li><a href="upload-data.html"><i class="fas fa-upload"></i> <span>Upload Data</span></a></li>
+                    <li><a href="reports.html"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="assets/img/user-profile.jpg" alt="Admin User" class="user-avatar"> <!-- Optional: add an image -->
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+                <h1>Maintenance Requests</h1>
+                <p class="subheader">Review, approve, and track maintenance requests.</p>
+            </header>
+
+            <!-- Summary Cards -->
+            <section class="summary-cards-section">
+                <div class="summary-card" data-status-filter="all">
+                    <div class="card-content">
+                        <h3>All Requests</h3>
+                        <p class="count" id="countAll">0</p>
+                    </div>
+                    <div class="card-icon"><i class="fas fa-list-alt"></i></div>
+                </div>
+                <div class="summary-card" data-status-filter="pending">
+                    <div class="card-content">
+                        <h3>Pending</h3>
+                        <p class="count" id="countPending">0</p>
+                    </div>
+                    <div class="card-icon icon-pending"><i class="fas fa-hourglass-half"></i></div>
+                </div>
+                <div class="summary-card" data-status-filter="approved">
+                    <div class="card-content">
+                        <h3>Approved</h3>
+                        <p class="count" id="countApproved">0</p>
+                    </div>
+                    <div class="card-icon icon-approved"><i class="fas fa-thumbs-up"></i></div>
+                </div>
+                <div class="summary-card" data-status-filter="in-progress">
+                    <div class="card-content">
+                        <h3>In Progress</h3>
+                        <p class="count" id="countInProgress">0</p>
+                    </div>
+                    <div class="card-icon icon-in-progress"><i class="fas fa-cogs"></i></div>
+                </div>
+                 <div class="summary-card" data-status-filter="completed">
+                    <div class="card-content">
+                        <h3>Completed</h3>
+                        <p class="count" id="countCompleted">0</p>
+                    </div>
+                    <div class="card-icon icon-completed"><i class="fas fa-check-circle"></i></div>
+                </div>
+                 <div class="summary-card" data-status-filter="rejected">
+                    <div class="card-content">
+                        <h3>Rejected</h3>
+                        <p class="count" id="countRejected">0</p>
+                    </div>
+                    <div class="card-icon icon-rejected"><i class="fas fa-times-circle"></i></div>
+                </div>
+            </section>
+
+            <!-- Table Section -->
+            <section class="table-section card">
+                <div class="card-header">
+                    <h2>Request List</h2>
+                    <div class="table-actions">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="globalSearch" placeholder="Search requests..." class="form-control">
+                        </div>
+                        <button class="btn btn-outline" id="toggleFiltersBtn">
+                            <i class="fas fa-filter"></i> More Filters <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
+                    </div>
+                </div>
+                <div class="advanced-filters" id="advancedFiltersPanel">
+                    <div class="filter-group">
+                        <label for="dateRangeStart">Date Range:</label>
+                        <input type="date" id="dateRangeStart" class="form-control">
+                        <span>to</span>
+                        <input type="date" id="dateRangeEnd" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="priorityFilter">Priority:</label>
+                        <select id="priorityFilter" class="form-control">
+                            <option value="">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="clientFilter">Client:</label>
+                        <select id="clientFilter" class="form-control">
+                            <option value="">All Clients</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" id="applyAdvancedFilters">Apply Filters</button>
+                    <button class="btn btn-link" id="clearAdvancedFilters">Clear Filters</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="requestsTable" class="display compact" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Client</th>
+                                    <th>Vehicle</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Budget</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Request Details Modal -->
+    <div id="requestDetailsModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h4 id="modalTitle">Maintenance Request Details</h4>
+                <button class="close-btn" id="closeModalBtn">×</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <!-- Details will be populated by JavaScript -->
+                <p>Loading details...</p>
+            </div>
+            <div class="modal-footer" id="modalActionFooter">
+                <!-- Dynamic action buttons -->
+            </div>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="toast">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+    // Mock data (same as your React example)
+    let requestsData = [
+        { id: 'REQ-2025-045', client: 'ABC Corporation', vehicle: 'Toyota Land Cruiser (ABC-123)', type: 'Regular Maintenance', date: '2025-05-05', budget: 1200, status: 'pending', priority: 'medium', representative: null },
+        { id: 'REQ-2025-044', client: 'XYZ Industries', vehicle: 'Ford F-150 (XYZ-456)', type: 'Repair', date: '2025-05-04', budget: 2500, representative: 'James Wilson', status: 'approved', priority: 'high' },
+        { id: 'REQ-2025-043', client: 'Global Logistics', vehicle: 'Mercedes Sprinter (GLO-789)', type: 'Emergency Repair', date: '2025-05-03', budget: 3800, representative: 'Maria Rodriguez', status: 'in-progress', priority: 'high' },
+        { id: 'REQ-2025-042', client: 'Tech Solutions Inc', vehicle: 'Nissan Patrol (TEC-012)', type: 'Routine Inspection', date: '2025-05-02', budget: 800, representative: 'Lisa Chen', status: 'completed', priority: 'low' },
+        { id: 'REQ-2025-041', client: 'First National Bank', vehicle: 'Lexus LX570 (FNB-345)', type: 'Repair', date: '2025-05-01', budget: 1950, status: 'rejected', priority: 'medium', representative: null },
+        { id: 'REQ-2025-040', client: 'ABC Corporation', vehicle: 'Toyota Hilux (ABC-456)', type: 'Regular Maintenance', date: '2025-04-30', budget: 950, representative: 'David Kim', status: 'completed', priority: 'low' },
+        { id: 'REQ-2025-039', client: 'XYZ Industries', vehicle: 'Ford Ranger (XYZ-789)', type: 'Emergency Repair', date: '2025-04-29', budget: 3200, representative: 'James Wilson', status: 'completed', priority: 'high' },
+    ];
+
+    let currentStatusFilter = 'all';
+    let currentPriorityFilter = '';
+    let currentClientFilter = '';
+    let currentDateStart = '';
+    let currentDateEnd = '';
+
+    // --- Initialize DataTables ---
+    const requestsTable = $('#requestsTable').DataTable({
+        data: requestsData,
+        responsive: true,
+        columns: [
+            { data: 'id', className: 'font-mono text-sm' },
+            { data: 'client', className: 'font-medium' },
+            { data: 'vehicle' },
+            { data: 'type' },
+            { 
+                data: 'date',
+                render: function(data) {
+                    return new Date(data).toLocaleDateString();
+                }
+            },
+            { 
+                data: 'budget',
+                render: function(data) {
+                    return '$' + data.toLocaleString();
+                }
+            },
+            { 
+                data: 'status',
+                render: function(data) {
+                    const statusText = data.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return `<span class="badge badge-${data}">${statusText}</span>`;
+                }
+            },
+            {
+                data: 'priority',
+                render: function(data) {
+                    const priorityText = data.charAt(0).toUpperCase() + data.slice(1);
+                    return `<span class="badge badge-priority-${data}">${priorityText}</span>`;
+                }
+            },
+            { 
+                data: null,
+                orderable: false,
+                className: 'action-buttons',
+                render: function(data, type, row) {
+                    let buttons = `<button class="btn btn-icon btn-view" title="View Details" data-id="${row.id}"><i class="fas fa-eye"></i></button>`;
+                    if (row.status === 'pending') {
+                        buttons += ` <button class="btn btn-icon btn-approve" title="Approve" data-id="${row.id}"><i class="fas fa-thumbs-up"></i></button>`;
+                        buttons += ` <button class="btn btn-icon btn-reject" title="Reject" data-id="${row.id}"><i class="fas fa-thumbs-down"></i></button>`;
+                    }
+                    return buttons;
+                }
+            }
+        ],
+        language: {
+            search: "_INPUT_", // Remove label, use placeholder
+            searchPlaceholder: "Search in table...",
+            lengthMenu: "Show _MENU_ entries"
+        },
+        dom: 'rt<"bottom-controls"<"info-wrapper"li>p>', // Remove default filter, length. Retain table, info, pagination.
+         pageLength: 7, // Default entries
+         lengthMenu: [ [7, 10, 25, 50, -1], [7, 10, 25, 50, "All"] ]
+    });
+
+    // --- Custom Filtering Function ---
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex) {
+            const rowData = requestsData[dataIndex]; // Get original object for easier access
+
+            // Status filter from summary cards
+            const statusMatch = (currentStatusFilter === 'all' || rowData.status === currentStatusFilter);
+
+            // Priority filter
+            const priorityMatch = (currentPriorityFilter === '' || rowData.priority === currentPriorityFilter);
+
+            // Client filter
+            const clientMatch = (currentClientFilter === '' || rowData.client === currentClientFilter);
+
+            // Date range filter
+            let dateMatch = true;
+            if (currentDateStart || currentDateEnd) {
+                const requestDate = new Date(rowData.date);
+                const startDate = currentDateStart ? new Date(currentDateStart) : null;
+                const endDate = currentDateEnd ? new Date(currentDateEnd) : null;
+                
+                // Normalize dates to remove time component for fair comparison
+                if (startDate) startDate.setHours(0,0,0,0);
+                if (endDate) endDate.setHours(0,0,0,0);
+                requestDate.setHours(0,0,0,0);
+
+                if (startDate && requestDate < startDate) dateMatch = false;
+                if (endDate && requestDate > endDate) dateMatch = false;
+            }
+            
+            return statusMatch && priorityMatch && clientMatch && dateMatch;
+        }
+    );
+
+    // --- Populate Client Filter Dropdown ---
+    function populateClientFilter() {
+        const clients = [...new Set(requestsData.map(req => req.client))].sort();
+        const $clientFilter = $('#clientFilter');
+        $clientFilter.empty().append('<option value="">All Clients</option>');
+        clients.forEach(client => {
+            $clientFilter.append(`<option value="${client}">${client}</option>`);
+        });
+    }
+    populateClientFilter();
+
+    // --- Update Counts & UI ---
+    function updateCountsAndUI() {
+        const counts = {
+            all: requestsData.length,
+            pending: requestsData.filter(r => r.status === 'pending').length,
+            approved: requestsData.filter(r => r.status === 'approved').length,
+            inProgress: requestsData.filter(r => r.status === 'in-progress').length,
+            completed: requestsData.filter(r => r.status === 'completed').length,
+            rejected: requestsData.filter(r => r.status === 'rejected').length,
+        };
+        $('#countAll').text(counts.all);
+        $('#countPending').text(counts.pending);
+        $('#countApproved').text(counts.approved);
+        $('#countInProgress').text(counts.inProgress);
+        $('#countCompleted').text(counts.completed);
+        $('#countRejected').text(counts.rejected);
+
+        // Highlight active summary card
+        $('.summary-card').removeClass('active');
+        $(`.summary-card[data-status-filter="${currentStatusFilter}"]`).addClass('active');
+        
+        requestsTable.draw(); // Redraw table to apply filters
+    }
+    updateCountsAndUI(); // Initial call
+
+    // --- Event Handlers ---
+
+    // Global Search
+    $('#globalSearch').on('keyup', function() {
+        requestsTable.search(this.value).draw();
+    });
+
+    // Summary Card Clicks
+    $('.summary-card').on('click', function() {
+        currentStatusFilter = $(this).data('status-filter');
+        updateCountsAndUI();
+    });
+
+    // Toggle Advanced Filters Panel
+    $('#toggleFiltersBtn').on('click', function() {
+        const $panel = $('#advancedFiltersPanel');
+        $panel.slideToggle();
+        $(this).find('i.fa-chevron-down, i.fa-chevron-up')
+               .toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Apply Advanced Filters
+    $('#applyAdvancedFilters').on('click', function() {
+        currentPriorityFilter = $('#priorityFilter').val();
+        currentClientFilter = $('#clientFilter').val();
+        currentDateStart = $('#dateRangeStart').val();
+        currentDateEnd = $('#dateRangeEnd').val();
+        requestsTable.draw();
+    });
+    
+    // Clear Advanced Filters
+    $('#clearAdvancedFilters').on('click', function() {
+        $('#priorityFilter').val('');
+        $('#clientFilter').val('');
+        $('#dateRangeStart').val('');
+        $('#dateRangeEnd').val('');
+        currentPriorityFilter = '';
+        currentClientFilter = '';
+        currentDateStart = '';
+        currentDateEnd = '';
+        requestsTable.draw();
+    });
+
+    // Action Buttons (View, Approve, Reject) - Event Delegation
+    $('#requestsTable tbody').on('click', 'button', function() {
+        const action = $(this).attr('class').match(/btn-(view|approve|reject)/)[1];
+        const requestId = $(this).data('id');
+        const request = requestsData.find(r => r.id === requestId);
+
+        if (!request) return;
+
+        if (action === 'view') {
+            openDetailsModal(request);
+        } else if (action === 'approve') {
+            if (confirm(`Are you sure you want to approve request ${request.id}?`)) {
+                updateRequestStatus(requestId, 'approved');
+                showToast(`${request.id} approved. Please assign a representative.`, 'success');
+            }
+        } else if (action === 'reject') {
+             if (confirm(`Are you sure you want to reject request ${request.id}?`)) {
+                updateRequestStatus(requestId, 'rejected');
+                showToast(`${request.id} has been rejected.`, 'info');
+            }
+        }
+    });
+
+    function updateRequestStatus(id, newStatus) {
+        const requestIndex = requestsData.findIndex(r => r.id === id);
+        if (requestIndex > -1) {
+            requestsData[requestIndex].status = newStatus;
+            // In a real app, you might also set/clear representative here
+            // e.g., if newStatus === 'approved', requestsData[requestIndex].representative = null; 
+            
+            // Update DataTables row
+            requestsTable.row(requestIndex).data(requestsData[requestIndex]).invalidate().draw(false);
+            updateCountsAndUI(); // Update summary counts and potentially re-filter
+        }
+    }
+
+    // --- Modal Logic ---
+    const $modal = $('#requestDetailsModal');
+    const $modalBody = $('#modalBodyContent');
+    const $modalTitle = $('#modalTitle');
+    const $modalFooter = $('#modalActionFooter');
+
+    function openDetailsModal(request) {
+        $modalTitle.text(`Details for Request: ${request.id}`);
+        
+        let detailsHtml = `
+            <div class="detail-grid">
+                <div class="detail-section">
+                    <h5>Request Information</h5>
+                    <div class="detail-item"><span class="label">Client:</span> <span class="value">${request.client}</span></div>
+                    <div class="detail-item"><span class="label">Vehicle:</span> <span class="value">${request.vehicle}</span></div>
+                    <div class="detail-item"><span class="label">Type:</span> <span class="value">${request.type}</span></div>
+                    <div class="detail-item"><span class="label">Date:</span> <span class="value">${new Date(request.date).toLocaleDateString()}</span></div>
+                </div>
+                <div class="detail-section">
+                    <h5>Financial & Status</h5>
+                    <div class="detail-item"><span class="label">Budget:</span> <span class="value">$${request.budget.toLocaleString()}</span></div>
+                    <div class="detail-item"><span class="label">Status:</span> <span class="value"><span class="badge badge-${request.status}">${request.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></span></div>
+                    <div class="detail-item"><span class="label">Priority:</span> <span class="value"><span class="badge badge-priority-${request.priority}">${request.priority.charAt(0).toUpperCase() + request.priority.slice(1)}</span></span></div>
+                    <div class="detail-item"><span class="label">Representative:</span> <span class="value">${request.representative || 'Not Assigned'}</span></div>
+                </div>
+            </div>
+            <div class="detail-section" style="margin-top: 1.5rem;">
+                <h5>Description / Notes (Placeholder)</h5>
+                <p class="text-muted">Client reported unusual engine noise during startup. Regular 50,000km service also due.</p>
+            </div>
+        `;
+        $modalBody.html(detailsHtml);
+
+        // Modal Actions
+        let footerHtml = `<button class="btn btn-secondary" id="closeModalBtnFooter">Close</button>`;
+        if (request.status === 'pending') {
+            footerHtml += `<button class="btn btn-danger modal-action-reject" data-id="${request.id}"><i class="fas fa-thumbs-down"></i> Reject</button>`;
+            footerHtml += `<button class="btn btn-success modal-action-approve" data-id="${request.id}"><i class="fas fa-thumbs-up"></i> Approve</button>`;
+        } else if (request.status === 'approved' && !request.representative) {
+             footerHtml += `<button class="btn btn-primary modal-action-assign" data-id="${request.id}"><i class="fas fa-user-plus"></i> Assign Rep</button>`;
+        }
+        $modalFooter.html(footerHtml);
+
+        $modal.addClass('show');
+    }
+
+    $('#closeModalBtn, #modalActionFooter').on('click', '#closeModalBtnFooter', function() { // Event delegation for footer button
+        $modal.removeClass('show');
+    });
+    
+    // Modal dynamic action buttons
+    $modalFooter.on('click', '.modal-action-approve', function() {
+        const requestId = $(this).data('id');
+        if (confirm(`Are you sure you want to approve request ${requestId} from modal?`)) {
+            updateRequestStatus(requestId, 'approved');
+            showToast(`${requestId} approved. Please assign a representative.`, 'success');
+            $modal.removeClass('show'); // Close modal after action
+        }
+    });
+    $modalFooter.on('click', '.modal-action-reject', function() {
+        const requestId = $(this).data('id');
+        if (confirm(`Are you sure you want to reject request ${requestId} from modal?`)) {
+            updateRequestStatus(requestId, 'rejected');
+            showToast(`${requestId} has been rejected.`, 'info');
+            $modal.removeClass('show');
+        }
+    });
+    $modalFooter.on('click', '.modal-action-assign', function() {
+        const requestId = $(this).data('id');
+        const repName = prompt(`Assign representative to ${requestId}:`, "Technician A");
+        if (repName) {
+             const requestIndex = requestsData.findIndex(r => r.id === requestId);
+             if (requestIndex > -1) {
+                requestsData[requestIndex].representative = repName;
+                requestsData[requestIndex].status = 'in-progress'; // Or keep as 'approved' depending on workflow
+                requestsTable.row(requestIndex).data(requestsData[requestIndex]).invalidate().draw(false);
+                updateCountsAndUI();
+                showToast(`${requestId} assigned to ${repName} and set to In Progress.`, 'success');
+                $modal.removeClass('show');
+            }
+        }
+    });
+
+    // Close modal if backdrop is clicked
+    $modal.on('click', function(event) {
+        if (event.target === this) {
+            $modal.removeClass('show');
+        }
+    });
+    
+    // --- Toast Notification ---
+    const $toast = $('#toastNotification');
+    const $toastMessage = $('#toastMessage');
+    let toastTimeout;
+
+    function showToast(message, type = 'info') { // type can be 'success', 'error', 'info'
+        $toastMessage.text(message);
+        $toast.removeClass('success error info').addClass(type).addClass('show');
+        
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            $toast.removeClass('show');
+        }, 3000);
+    }
+
+    // --- Sidebar Toggle ---
+    const $sidebar = $('.sidebar');
+    const $mainContent = $('.main-content');
+    $('#sidebarToggle').on('click', function() {
+        $sidebar.toggleClass('open');
+        // Optional: Add a class to main content if sidebar is open for specific styling
+        // $mainContent.toggleClass('sidebar-is-open'); 
+    });
+
+    // Responsive: Close sidebar if clicking outside on mobile
+    $(document).on('click', function(event) {
+        if ($(window).width() < 992) { // Only on mobile view
+            if ($sidebar.hasClass('open') && !$(event.target).closest('.sidebar').length && !$(event.target).closest('#sidebarToggle').length) {
+                $sidebar.removeClass('open');
+            }
+        }
+    });
+
+});
+</script>
+</body>
+</html>
